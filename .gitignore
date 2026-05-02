@@ -1,0 +1,63 @@
+# Gradle caches and generated build outputs
+.gradle/
+**/.gradle/
+build/
+**/build/
+
+# Keep the Gradle wrapper jar versioned
+!gradle/wrapper/gradle-wrapper.jar
+
+# GeoGebra web generated output
+/source/web/*/war/
+/source/web/*/extras/
+
+# Tracked web fixture pages that live under war directories
+!/source/web/editor-web/war/
+!/source/web/editor-web/war/index.html
+!/source/web/keyboard-web/war/
+!/source/web/keyboard-web/war/keyboard.html
+!/source/web/renderer-web/war/
+!/source/web/renderer-web/war/debugbox.html
+!/source/web/renderer-web/war/index.html
+!/source/web/renderer-web/war/inlineTest.html
+
+# Java and IDE metadata
+out/
+*.class
+*.iml
+.idea/
+.classpath
+.project
+.settings/
+.vscode/
+
+# Node and web test artifacts
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.pnpm-store/
+coverage/
+.nyc_output/
+playwright-report/
+test-results/
+
+# Logs, temp files, and local environment
+*.log
+*.tmp
+*.temp
+*.swp
+*.swo
+.env
+.env.*
+!.env.example
+tmp/
+temp/
+.cache/
+
+# OS generated files
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Desktop.ini

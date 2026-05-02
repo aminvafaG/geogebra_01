@@ -1,2 +1,11 @@
 */war
 */extras
+
+!editor-web/war/
+!editor-web/war/index.html
+!keyboard-web/war/
+!keyboard-web/war/keyboard.html
+!renderer-web/war/
+!renderer-web/war/debugbox.html
+!renderer-web/war/index.html
+!renderer-web/war/inlineTest.html

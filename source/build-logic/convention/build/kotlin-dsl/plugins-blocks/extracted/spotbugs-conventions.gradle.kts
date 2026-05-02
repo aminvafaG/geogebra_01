@@ -1,6 +1,0 @@
-                                            
-                                    
-
-plugins {
-    id("com.github.spotbugs")
-}
