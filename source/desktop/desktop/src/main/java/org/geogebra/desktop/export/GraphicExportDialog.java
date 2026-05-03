@@ -53,6 +53,7 @@ import org.freehep.util.UserProperties;
 import org.geogebra.common.awt.GGraphics2D;
 import org.geogebra.common.euclidian.Drawable;
 import org.geogebra.common.euclidian.EuclidianView;
+import org.geogebra.common.geogebra3D.euclidian3D.EuclidianView3D;
 import org.geogebra.common.main.App;
 import org.geogebra.common.main.App.ExportType;
 import org.geogebra.common.main.MyError.Errors;
@@ -223,8 +224,13 @@ public class GraphicExportDialog extends Dialog implements KeyListener {
 		String[] formats;
 
 		if (getEuclidianView().isEuclidianView3D()) {
+			// 3D view: PNG (raster) and PDF (vector via PDF3DProjector).
+			// SVG/EMF are not yet supported for 3D — adding them requires
+			// exposing PDF3DProjector through those FreeHEP exporters too,
+			// which is straightforward but not done yet.
 			formats = new String[] {
-					loc.getMenu("png") + " (" + FileExtensions.PNG + ")" };
+					loc.getMenu("png") + " (" + FileExtensions.PNG + ")",
+					loc.getMenu("pdf") };
 		} else {
 			formats = new String[] {
 					loc.getMenu("png") + " (" + FileExtensions.PNG + ")",
@@ -448,7 +454,11 @@ public class GraphicExportDialog extends Dialog implements KeyListener {
 			break;
 
 		case PDF: // PDF
-			exportPDF(toClipboard);
+			if (getEuclidianView().isEuclidianView3D()) {
+				exportPDF3D(toClipboard);
+			} else {
+				exportPDF(toClipboard);
+			}
 			break;
 
 		case SVG: // SVG
@@ -689,6 +699,43 @@ public class GraphicExportDialog extends Dialog implements KeyListener {
 			app.showError(Errors.SaveFileFailed);
 
 		}
+	}
+
+	/**
+	 * Exports the live 3D view as a vector PDF.
+	 *
+	 * Schedules the actual capture+emit on the renderer's next frame (so that
+	 * geometry buffers are stable). Then triggers a repaint so the runnable
+	 * fires.
+	 *
+	 * Clipboard mode is not supported for 3D PDF (the export is asynchronous);
+	 * we fall through and write to the temp file. The user can copy from the
+	 * temp file manually if needed.
+	 */
+	private void exportPDF3D(boolean exportToClipboard) {
+		EuclidianViewInterfaceD ev = getEuclidianView();
+		if (!(ev instanceof EuclidianView3D)) {
+			return;
+		}
+
+		File file;
+		String tempDir = UtilD.getTempDir();
+		if (exportToClipboard) {
+			file = new File(tempDir + "geogebra.pdf");
+		} else {
+			file = app.getGuiManager().showSaveDialog(FileExtensions.PDF, null,
+					loc.getMenu("pdf") + " " + loc.getMenu("Files"), true,
+					false);
+		}
+		if (file == null) {
+			return;
+		}
+		EuclidianView3D view3D = (EuclidianView3D) ev;
+		Export3DPdf.scheduleExport(view3D, file, exportScale);
+		// Mark the view dirty so the renderer schedules a frame and fires the
+		// export runnable. The JOGL animator runs continuously in practice,
+		// but this is the safe path used by other 3D code.
+		view3D.setWaitForUpdate();
 	}
 
 	/**

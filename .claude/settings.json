@@ -1,0 +1,23 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(./gradlew.bat projects *)",
+      "Bash(./gradlew.bat :desktop:tasks --quiet)",
+      "Bash(./gradlew.bat :desktop:classes --quiet)",
+      "Bash(../../gradlew.bat :desktop:classes --quiet)",
+      "Bash(../../gradlew.bat :desktop:classes)",
+      "Bash(../../gradlew.bat :common:compileJava)",
+      "Bash(../../gradlew.bat :desktop:run)",
+      "Bash(tasklist /FI \"IMAGENAME eq java.exe\")",
+      "PowerShell(Get-Process java -ErrorAction SilentlyContinue)",
+      "PowerShell($proc = Get-Process java -ErrorAction SilentlyContinue | Where-Object { $_.StartTime -gt \\(Get-Date\\).AddMinutes\\(-30\\) }; if \\($proc\\) { $proc | Format-Table Id,StartTime,MainWindowTitle -AutoSize } else { \"No recent java process\" })",
+      "WebSearch",
+      "WebFetch(domain:geogebra.github.io)",
+      "WebFetch(domain:github.com)",
+      "PowerShell(Get-Command asy -ErrorAction SilentlyContinue)",
+      "PowerShell(Get-Command pdflatex -ErrorAction SilentlyContinue)",
+      "Bash(asy -f pdf -noprc Final_Helal_1404_BSe_BMo.asy)",
+      "Bash(grep -c 'circ\\\\|\\\\\\\\\\\\\\\\' \"C:/Users/aminv/Documents/geogebra_01/Ali_example_01/Final_Helal_1404_BSe_BMo.asy\")"
+    ]
+  }
+}

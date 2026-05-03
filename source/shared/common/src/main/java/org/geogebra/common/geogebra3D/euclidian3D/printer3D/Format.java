@@ -304,7 +304,7 @@ abstract public class Format {
 	 * 
 	 * @return true if it needs both-sided surfaces
 	 */
-	abstract boolean needsBothSided();
+	protected abstract boolean needsBothSided();
 
 	/**
 	 * set if it wants filled solids

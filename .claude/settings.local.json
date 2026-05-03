@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(powershell -Command \"Expand-Archive -Path Final_Helal_1404_BSe_BMo.ggb -DestinationPath ggb_extract -Force; Get-ChildItem -Recurse ggb_extract | Select-Object Name\")",
+      "Bash(powershell -Command \"Copy-Item Final_Helal_1404_BSe_BMo.ggb ggb_extract.zip -Force; Expand-Archive -Path ggb_extract.zip -DestinationPath ggb_extract -Force; Get-ChildItem ggb_extract\")"
+    ]
+  }
+}
