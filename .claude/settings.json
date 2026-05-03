@@ -17,7 +17,30 @@
       "PowerShell(Get-Command asy -ErrorAction SilentlyContinue)",
       "PowerShell(Get-Command pdflatex -ErrorAction SilentlyContinue)",
       "Bash(asy -f pdf -noprc Final_Helal_1404_BSe_BMo.asy)",
-      "Bash(grep -c 'circ\\\\|\\\\\\\\\\\\\\\\' \"C:/Users/aminv/Documents/geogebra_01/Ali_example_01/Final_Helal_1404_BSe_BMo.asy\")"
+      "Bash(grep -c 'circ\\\\|\\\\\\\\\\\\\\\\' \"C:/Users/aminv/Documents/geogebra_01/Ali_example_01/Final_Helal_1404_BSe_BMo.asy\")",
+      "Bash(unzip -l Final_Helal_1404_BSe_BMo.ggb)",
+      "Bash(unzip -p Final_Helal_1404_BSe_BMo.ggb geogebra.xml)",
+      "WebFetch(domain:latex.org)",
+      "Bash(where pdflatex *)",
+      "Bash(where xelatex *)",
+      "Bash(where latexmk *)",
+      "Bash(pdflatex -interaction=nonstopmode -halt-on-error helal.tex)",
+      "Bash(pdftoppm -r 150 -png helal.pdf helal_preview)",
+      "Bash(fc-list :lang=fa)",
+      "Bash(xelatex -interaction=nonstopmode -halt-on-error helal.tex)",
+      "Bash(perl -i -pe 's/\\\\x01//g' helal.tex)",
+      "Bash(xelatex -interaction=batchmode \"\\\\def\\\\Oola{45}\\\\def\\\\Taghvim{60}\\\\def\\\\BoadSeva{30}\\\\input{helal.tex}\")",
+      "Bash(pdftoppm -r 150 -png helal.pdf helal_alt)",
+      "Bash(cp Final_Helal_1404_BSe_BMo.asy.recovered ggb_export.asy)",
+      "Bash(asy -f pdf ggb_export.asy)",
+      "Bash(pdftoppm -r 150 -png ggb_export.pdf ggb_export_preview)",
+      "Bash(python ggb2pdf.py)",
+      "Bash(pdftoppm -r 150 -png Final_Helal_1404_BSe_BMo.pdf pipe_preview)",
+      "Read(//c/texlive/2025/texmf-dist/tex/latex/tikz-3dplot/**)",
+      "Bash(pdftoppm -r 130 -png \"../Final_Helal_1404_BSe_BMo.pdf\" check2)"
+    ],
+    "additionalDirectories": [
+      "C:\\Users\\aminv\\Documents\\geogebra_01\\Ali_example_01"
     ]
   }
 }

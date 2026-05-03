@@ -1,0 +1,307 @@
+% =====================================================================
+%  helal.tex
+%  Vector-PDF replication of  Final_Helal_1404_BSe_BMo.ggb
+%  Renders only elements that have show object="true" in the GGB 3D view.
+%
+%  Compile:   xelatex helal.tex
+%  Or via the pipeline:   python ggb2pdf.py
+%
+%  Override any parameter:
+%      xelatex "\def\Oola{200}\def\Taghvim{90}\input{helal.tex}"
+% =====================================================================
+\documentclass[border=4mm,tikz]{standalone}
+
+% Persian text support
+\usepackage{fontspec}
+\newfontfamily{\fa}{Tahoma}
+\usepackage{bidi}
+
+% 3-D drawing
+\usepackage{tikz-3dplot}
+\usetikzlibrary{calc,arrows.meta,decorations.markings,backgrounds,positioning}
+
+\pgfdeclarelayer{back}\pgfdeclarelayer{front}
+\pgfsetlayers{back,main,front}
+
+% --- PARAMETERS (overridable from command line via \def) -----------
+\providecommand{\R}{5.36048}
+\providecommand{\Arz}{36}
+\providecommand{\Mayl}{23.5}
+\providecommand{\Oola}{340.66}
+\providecommand{\Taghvim}{150}
+\providecommand{\BoadSeva}{17.5}
+\providecommand{\ArzGhamar}{-5.3}
+\providecommand{\TaghvimGhamar}{0}
+\providecommand{\mTheta}{72}
+\providecommand{\mPhi}{110}
+\providecommand{\showInner}{0}
+\providecommand{\showLabels}{1}
+
+\tdplotsetmaincoords{\mTheta}{\mPhi}
+
+% --- MACROS -------------------------------------------------------
+\newcommand{\rotateAround}[7]{%
+  \pgfmathsetmacro{\kkn}{sqrt((#4)*(#4)+(#5)*(#5)+(#6)*(#6))}%
+  \pgfmathsetmacro{\kkx}{(#4)/\kkn}%
+  \pgfmathsetmacro{\kky}{(#5)/\kkn}%
+  \pgfmathsetmacro{\kkz}{(#6)/\kkn}%
+  \pgfmathsetmacro{\co}{cos(#7)}\pgfmathsetmacro{\si}{sin(#7)}%
+  \pgfmathsetmacro{\dt}{\kkx*(#1)+\kky*(#2)+\kkz*(#3)}%
+  \pgfmathsetmacro{\cpx}{\kky*(#3)-\kkz*(#2)}%
+  \pgfmathsetmacro{\cpy}{\kkz*(#1)-\kkx*(#3)}%
+  \pgfmathsetmacro{\cpz}{\kkx*(#2)-\kky*(#1)}%
+  \pgfmathsetmacro{\rRx}{(#1)*\co+\cpx*\si+\kkx*\dt*(1-\co)}%
+  \pgfmathsetmacro{\rRy}{(#2)*\co+\cpy*\si+\kky*\dt*(1-\co)}%
+  \pgfmathsetmacro{\rRz}{(#3)*\co+\cpz*\si+\kkz*\dt*(1-\co)}%
+}
+
+\newcommand{\drawCircle}[6]{%
+  \begingroup
+  \pgfmathsetmacro{\nrm}{sqrt((#1)*(#1)+(#2)*(#2)+(#3)*(#3))}%
+  \pgfmathsetmacro{\nx}{(#1)/\nrm}\pgfmathsetmacro{\ny}{(#2)/\nrm}\pgfmathsetmacro{\nz}{(#3)/\nrm}%
+  \pgfmathsetmacro{\nxy}{sqrt(\nx*\nx+\ny*\ny)}%
+  \pgfmathparse{\nxy<0.001 ? 1 : 0}\let\nIsZ\pgfmathresult
+  \ifnum\nIsZ=1
+    \def\ux{1}\def\uy{0}\def\uz{0}\def\vx{0}\def\vy{1}\def\vz{0}%
+  \else
+    \pgfmathsetmacro{\ux}{ \ny/\nxy}\pgfmathsetmacro{\uy}{-\nx/\nxy}\def\uz{0}%
+    \pgfmathsetmacro{\vx}{\ny*\uz-\nz*\uy}%
+    \pgfmathsetmacro{\vy}{\nz*\ux-\nx*\uz}%
+    \pgfmathsetmacro{\vz}{\nx*\uy-\ny*\ux}%
+  \fi
+  \pgfmathsetmacro{\dx}{sin(\mTheta)*cos(\mPhi)}%
+  \pgfmathsetmacro{\dy}{sin(\mTheta)*sin(\mPhi)}%
+  \pgfmathsetmacro{\dz}{cos(\mTheta)}%
+  \pgfmathsetmacro{\Av}{\ux*\dx+\uy*\dy+\uz*\dz}%
+  \pgfmathsetmacro{\Bv}{\vx*\dx+\vy*\dy+\vz*\dz}%
+  \pgfmathsetmacro{\tvis}{atan2(\Bv,\Av)}%
+  \pgfmathsetmacro{\tA}{\tvis-90}\pgfmathsetmacro{\tB}{\tvis+90}\pgfmathsetmacro{\tC}{\tvis+270}%
+  \draw[#5] plot[domain=\tA:\tB,samples=80,smooth,variable=\t]
+    ({(#4)*(\ux*cos(\t)+\vx*sin(\t))},
+     {(#4)*(\uy*cos(\t)+\vy*sin(\t))},
+     {(#4)*(\uz*cos(\t)+\vz*sin(\t))});
+  \begin{pgfonlayer}{back}
+    \draw[#6] plot[domain=\tB:\tC,samples=80,smooth,variable=\t]
+      ({(#4)*(\ux*cos(\t)+\vx*sin(\t))},
+       {(#4)*(\uy*cos(\t)+\vy*sin(\t))},
+       {(#4)*(\uz*cos(\t)+\vz*sin(\t))});
+  \end{pgfonlayer}
+  \endgroup
+}
+
+\newcommand{\drawSmallCircle}[9]{%
+  \begingroup
+  \pgfmathsetmacro{\nrm}{sqrt((#4)*(#4)+(#5)*(#5)+(#6)*(#6))}%
+  \pgfmathsetmacro{\nx}{(#4)/\nrm}\pgfmathsetmacro{\ny}{(#5)/\nrm}\pgfmathsetmacro{\nz}{(#6)/\nrm}%
+  \pgfmathsetmacro{\nxy}{sqrt(\nx*\nx+\ny*\ny)}%
+  \pgfmathparse{\nxy<0.001 ? 1 : 0}\let\nIsZ\pgfmathresult
+  \ifnum\nIsZ=1
+    \def\ux{1}\def\uy{0}\def\uz{0}\def\vx{0}\def\vy{1}\def\vz{0}%
+  \else
+    \pgfmathsetmacro{\ux}{ \ny/\nxy}\pgfmathsetmacro{\uy}{-\nx/\nxy}\def\uz{0}%
+    \pgfmathsetmacro{\vx}{\ny*\uz-\nz*\uy}%
+    \pgfmathsetmacro{\vy}{\nz*\ux-\nx*\uz}%
+    \pgfmathsetmacro{\vz}{\nx*\uy-\ny*\ux}%
+  \fi
+  \pgfmathsetmacro{\dx}{sin(\mTheta)*cos(\mPhi)}%
+  \pgfmathsetmacro{\dy}{sin(\mTheta)*sin(\mPhi)}%
+  \pgfmathsetmacro{\dz}{cos(\mTheta)}%
+  \pgfmathsetmacro{\Av}{\ux*\dx+\uy*\dy+\uz*\dz}%
+  \pgfmathsetmacro{\Bv}{\vx*\dx+\vy*\dy+\vz*\dz}%
+  \pgfmathsetmacro{\tvis}{atan2(\Bv,\Av)}%
+  \pgfmathsetmacro{\tA}{\tvis-90}\pgfmathsetmacro{\tB}{\tvis+90}\pgfmathsetmacro{\tC}{\tvis+270}%
+  \draw[#8] plot[domain=\tA:\tB,samples=60,smooth,variable=\t]
+    ({(#1)+(#7)*(\ux*cos(\t)+\vx*sin(\t))},
+     {(#2)+(#7)*(\uy*cos(\t)+\vy*sin(\t))},
+     {(#3)+(#7)*(\uz*cos(\t)+\vz*sin(\t))});
+  \begin{pgfonlayer}{back}
+    \draw[#9] plot[domain=\tB:\tC,samples=60,smooth,variable=\t]
+      ({(#1)+(#7)*(\ux*cos(\t)+\vx*sin(\t))},
+       {(#2)+(#7)*(\uy*cos(\t)+\vy*sin(\t))},
+       {(#3)+(#7)*(\uz*cos(\t)+\vz*sin(\t))});
+  \end{pgfonlayer}
+  \endgroup
+}
+
+\newcommand{\falabel}[3][above]{%
+  \ifnum\showLabels=1
+    \node[#1=3pt,font=\fa\footnotesize,inner sep=0.5pt,
+          fill=white,fill opacity=0.55,text opacity=1,
+          rounded corners=1pt] at (#2) {\RL{#3}};%
+  \fi}
+
+\begin{document}
+\begin{tikzpicture}[tdplot_main_coords,scale=0.85,>=Latex]
+
+% --- COORDINATES (computed from parameters) -----------------------
+\coordinate (O)   at (0,0,0);
+\coordinate (N)   at (-\R,0,0);
+\coordinate (S)   at ( \R,0,0);
+\coordinate (W)   at (0,-\R,0);
+\coordinate (E)   at (0, \R,0);
+\coordinate (Zen) at (0,0, \R);
+\coordinate (Nad) at (0,0,-\R);
+
+\pgfmathsetmacro{\NpX}{-\R*cos(\Arz)}
+\pgfmathsetmacro{\NpZ}{ \R*sin(\Arz)}
+\coordinate (Np)  at (\NpX,0,\NpZ);
+\coordinate (Sp)  at (-\NpX,0,-\NpZ);
+\coordinate (NpV) at (1.25*\NpX,0,1.25*\NpZ);
+\coordinate (SpV) at (-1.25*\NpX,0,-1.25*\NpZ);
+
+\pgfmathsetmacro{\Npx}{\NpX}\pgfmathsetmacro{\Npy}{0}\pgfmathsetmacro{\Npz}{\NpZ}
+\rotateAround{\NpX}{0}{\NpZ}{0}{1}{0}{\Mayl}
+\let\NppX\rRx \let\NppY\rRy \let\NppZ\rRz
+\rotateAround{\NppX}{\NppY}{\NppZ}{\Npx}{\Npy}{\Npz}{\Oola}
+\let\NpMX\rRx \let\NpMY\rRy \let\NpMZ\rRz
+\coordinate (NpM)  at (\NpMX,\NpMY,\NpMZ);
+\coordinate (NpMm) at (-\NpMX,-\NpMY,-\NpMZ);
+
+\pgfmathsetmacro{\HmXr}{\Npy*\NpMZ-\Npz*\NpMY}
+\pgfmathsetmacro{\HmYr}{\Npz*\NpMX-\Npx*\NpMZ}
+\pgfmathsetmacro{\HmZr}{\Npx*\NpMY-\Npy*\NpMX}
+\pgfmathsetmacro{\HmN}{sqrt(\HmXr*\HmXr+\HmYr*\HmYr+\HmZr*\HmZr)}
+\pgfmathsetmacro{\HmX}{\R*\HmXr/\HmN}
+\pgfmathsetmacro{\HmY}{\R*\HmYr/\HmN}
+\pgfmathsetmacro{\HmZ}{\R*\HmZr/\HmN}
+\coordinate (Hamal) at (\HmX,\HmY,\HmZ);
+\coordinate (Mizan) at (-\HmX,-\HmY,-\HmZ);
+
+\rotateAround{\HmX}{\HmY}{\HmZ}{\NpMX}{\NpMY}{\NpMZ}{-\Taghvim}
+\let\ShX\rRx \let\ShY\rRy \let\ShZ\rRz
+\coordinate (Shams) at (\ShX,\ShY,\ShZ);
+
+\pgfmathsetmacro{\GhXr}{-\NpMY}
+\pgfmathsetmacro{\GhYr}{ \NpMX}
+\pgfmathsetmacro{\GhN}{sqrt(\GhXr*\GhXr+\GhYr*\GhYr)}
+\pgfmathsetmacro{\GhSign}{(\GhYr/\GhN)<0 ? 1 : -1}
+\pgfmathsetmacro{\GhX}{\GhSign*\R*\GhXr/\GhN}
+\pgfmathsetmacro{\GhY}{\GhSign*\R*\GhYr/\GhN}
+\pgfmathsetmacro{\GhZ}{0}
+\coordinate (Ghareb) at (\GhX,\GhY,\GhZ);
+
+\rotateAround{\GhX}{\GhY}{\GhZ}{\NpMX}{\NpMY}{\NpMZ}{-\BoadSeva}
+\let\MgX\rRx \let\MgY\rRy \let\MgZ\rRz
+\coordinate (MozeGhamar) at (\MgX,\MgY,\MgZ);
+
+\rotateAround{\MgX}{\MgY}{\MgZ}{\NpMX}{\NpMY}{\NpMZ}{90}
+\let\MgpX\rRx \let\MgpY\rRy \let\MgpZ\rRz
+\rotateAround{\MgX}{\MgY}{\MgZ}{\MgpX}{\MgpY}{\MgpZ}{\ArzGhamar}
+\let\GhmX\rRx \let\GhmY\rRy \let\GhmZ\rRz
+\coordinate (Ghamar) at (\GhmX,\GhmY,\GhmZ);
+
+\coordinate (MagharebGhamr) at (\GhX,\GhY,\GhZ);
+
+\pgfmathsetmacro{\GhmDot}{(\GhmX*\Npx+\GhmY*\Npy+\GhmZ*\Npz)/\R}
+\pgfmathsetmacro{\cYGx}{\GhmDot*\Npx/\R}
+\pgfmathsetmacro{\cYGy}{\GhmDot*\Npy/\R}
+\pgfmathsetmacro{\cYGz}{\GhmDot*\Npz/\R}
+\pgfmathsetmacro{\rYG}{sqrt(\R*\R-\GhmDot*\GhmDot)}
+
+% --- LAYER 1+2: ball-shading on back layer ------------------------
+\begin{pgfonlayer}{back}
+  \begin{scope}[tdplot_screen_coords]
+    \shade[ball color=gray!40,opacity=0.40] (0,0) circle (\R);
+  \end{scope}
+\end{pgfonlayer}
+
+% --- LAYER 3: visible circles (matches GGB show=true) -------------
+\drawCircle{0}{0}{1}{\R}
+  {green!35!black,line width=1.2pt}
+  {green!35!black,line width=0.8pt,dashed,opacity=0.55}            % C_ofogh
+\drawCircle{0}{1}{0}{\R}
+  {red,line width=1.0pt}
+  {red,line width=0.7pt,dashed,opacity=0.45}                       % C_nesf
+\drawCircle{\NpX}{0}{\NpZ}{\R}
+  {blue,line width=1.1pt}
+  {blue,line width=0.8pt,dashed,opacity=0.55}                      % C_Moaddel
+\drawCircle{\NpMX}{\NpMY}{\NpMZ}{\R}
+  {violet,line width=1.1pt}
+  {violet,line width=0.8pt,dashed,opacity=0.55}                    % C_Mentaghe
+
+\drawSmallCircle{\cYGx}{\cYGy}{\cYGz}{\Npx}{\Npy}{\Npz}{\rYG}
+  {red!50!black,line width=0.6pt}
+  {red!50!black,line width=0.5pt,dashed,opacity=0.45}              % C_yomiGhamar
+
+\pgfmathsetmacro{\rOTG}{sqrt(max(\R*\R-\GhmZ*\GhmZ,0.0001))}
+\drawSmallCircle{0}{0}{\GhmZ}{0}{0}{1}{\rOTG}
+  {red!85!black,line width=0.7pt}
+  {red!85!black,line width=0.5pt,dashed,opacity=0.45}              % C_ofoghTaksiryGhamar
+
+% Arc_ArzGhamar
+\pgfmathsetmacro{\AaNx}{\GhmY*\MgZ-\GhmZ*\MgY}
+\pgfmathsetmacro{\AaNy}{\GhmZ*\MgX-\GhmX*\MgZ}
+\pgfmathsetmacro{\AaNz}{\GhmX*\MgY-\GhmY*\MgX}
+\pgfmathsetmacro{\AaNn}{sqrt(\AaNx*\AaNx+\AaNy*\AaNy+\AaNz*\AaNz+0.0001)}
+\pgfmathsetmacro{\AaVx}{(\AaNy*\GhmZ-\AaNz*\GhmY)/\AaNn}
+\pgfmathsetmacro{\AaVy}{(\AaNz*\GhmX-\AaNx*\GhmZ)/\AaNn}
+\pgfmathsetmacro{\AaVz}{(\AaNx*\GhmY-\AaNy*\GhmX)/\AaNn}
+\pgfmathsetmacro{\AaAng}{acos(min(1,max(-1,(\GhmX*\MgX+\GhmY*\MgY+\GhmZ*\MgZ)/(\R*\R))))}
+\draw[blue,line width=1.4pt]
+  plot[domain=0:\AaAng,samples=24,smooth,variable=\t]
+  ({cos(\t)*\GhmX + sin(\t)*\AaVx},
+   {cos(\t)*\GhmY + sin(\t)*\AaVy},
+   {cos(\t)*\GhmZ + sin(\t)*\AaVz});
+
+% --- LAYER 4: optional inner spheres b and d (GGB boolean r) -----
+\ifnum\showInner=1
+  \begin{scope}[tdplot_screen_coords]
+    \shade[ball color=yellow!40!green,opacity=0.30] (0,0) circle ({\R*0.70});
+    \shade[ball color=cyan!50!blue,opacity=0.85]    (0,0) circle ({\R*0.12});
+  \end{scope}
+\fi
+
+% --- LAYER 5: helper points G, K, M ------------------------------
+\coordinate (G) at (\cYGx,\cYGy,\cYGz);
+\pgfmathsetmacro{\KMx}{\GhmDot*\R/\Npx}
+\pgfmathsetmacro{\KMy}{sqrt(max(\R*\R-\KMx*\KMx,0.0001))}
+\coordinate (K) at (\KMx,-\KMy,0);
+\coordinate (M) at (\KMx, \KMy,0);
+
+% Visible segments (per GGB)
+\draw[black,line width=0.5pt]      (W)             -- (O);   % j_1
+\draw[black,line width=0.5pt]      (MagharebGhamr) -- (O);   % i_1
+\draw[red!70!black,line width=0.5pt] (Ghamar)      -- (G);   % k_1
+\draw[red!70!black,line width=0.5pt] (K)           -- (G);   % l_1
+
+% Visible vectors (per GGB)
+\draw[->,thick,black] (Zen) -- ($(Zen)+(0,0,0.30*\R)$);      % u_1
+\draw[->,blue,thick]  (Np)  -- (NpV);                        % v_1
+\draw[->,blue,thick]  (Sp)  -- (SpV);                        % w_1
+
+% --- LAYER 8: visible point dots --------------------------------
+\begin{pgfonlayer}{front}
+\foreach \p/\c/\sz in {%
+  N/red/2pt, S/red/2pt, E/orange/2pt, W/red/2pt,
+  Np/blue/2pt, Sp/blue/2pt, NpM/violet/1.6pt, NpMm/violet/1.6pt,
+  Hamal/red/1.8pt, Mizan/red/1.8pt,
+  Shams/orange/2.4pt, Ghareb/black/1.6pt,
+  MozeGhamar/red/2pt, Ghamar/orange/2.4pt,
+  MagharebGhamr/violet/1.6pt,
+  Zen/red/2pt, Nad/gray/1.8pt,
+  G/gray!60!black/1pt, K/gray!60!black/1pt, M/gray!60!black/1pt}
+{ \fill[\c] (\p) circle (\sz); }
+\end{pgfonlayer}
+
+% --- LAYER 9: Persian captions (only those GGB shows) ------------
+\falabel[above left=1pt]{N}{شمال}
+\falabel[below right=1pt]{S}{جنوب}
+\falabel[right=4pt]{E}{شرق}
+\falabel[left=4pt]{W}{غرب}
+\falabel[above right=1pt and 4pt]{Np}{ق ش}
+\falabel[below left=1pt and 4pt]{Sp}{ق ج}
+\falabel[above left=8pt and 0pt]{NpM}{ق م}
+\falabel[below right=8pt and 0pt]{NpMm}{ق م}
+\falabel[above right=2pt and 1pt]{Hamal}{حمل}
+\falabel[below left=2pt and 1pt]{Mizan}{میزان}
+\falabel[above=4pt]{Shams}{شمس}
+\falabel[left=4pt]{MozeGhamar}{مو قمر}
+\falabel[right=3pt]{Ghamar}{قمر}
+\ifnum\showLabels=1
+  \node[above right=0pt and 1pt,font=\tiny] at (G) {$G$};
+  \node[below=1pt,font=\tiny] at (K) {$K$};
+  \node[above=1pt,font=\tiny] at (M) {$M$};
+\fi
+
+\end{tikzpicture}
+\end{document}
