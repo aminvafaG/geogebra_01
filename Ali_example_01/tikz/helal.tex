@@ -69,23 +69,7 @@
     \pgfmathsetmacro{\vy}{\nz*\ux-\nx*\uz}%
     \pgfmathsetmacro{\vz}{\nx*\uy-\ny*\ux}%
   \fi
-  \pgfmathsetmacro{\dx}{sin(\mTheta)*cos(\mPhi)}%
-  \pgfmathsetmacro{\dy}{sin(\mTheta)*sin(\mPhi)}%
-  \pgfmathsetmacro{\dz}{cos(\mTheta)}%
-  \pgfmathsetmacro{\Av}{\ux*\dx+\uy*\dy+\uz*\dz}%
-  \pgfmathsetmacro{\Bv}{\vx*\dx+\vy*\dy+\vz*\dz}%
-  \pgfmathsetmacro{\tvis}{atan2(\Bv,\Av)}%
-  \pgfmathsetmacro{\tA}{\tvis-90}\pgfmathsetmacro{\tB}{\tvis+90}\pgfmathsetmacro{\tC}{\tvis+270}%
-  \draw[#5] plot[domain=\tA:\tB,samples=80,smooth,variable=\t]
-    ({(#4)*(\ux*cos(\t)+\vx*sin(\t))},
-     {(#4)*(\uy*cos(\t)+\vy*sin(\t))},
-     {(#4)*(\uz*cos(\t)+\vz*sin(\t))});
-  \begin{pgfonlayer}{back}
-    \draw[#6] plot[domain=\tB:\tC,samples=80,smooth,variable=\t]
-      ({(#4)*(\ux*cos(\t)+\vx*sin(\t))},
-       {(#4)*(\uy*cos(\t)+\vy*sin(\t))},
-       {(#4)*(\uz*cos(\t)+\vz*sin(\t))});
-  \end{pgfonlayer}
+  \drawSmallCircle{0}{0}{0}{#1}{#2}{#3}{#4}{#5}{#6}
   \endgroup
 }
 
@@ -103,23 +87,41 @@
     \pgfmathsetmacro{\vy}{\nz*\ux-\nx*\uz}%
     \pgfmathsetmacro{\vz}{\nx*\uy-\ny*\ux}%
   \fi
-  \pgfmathsetmacro{\dx}{sin(\mTheta)*cos(\mPhi)}%
-  \pgfmathsetmacro{\dy}{sin(\mTheta)*sin(\mPhi)}%
+  % Camera direction D pointing to the eye in tikz-3dplot
+  \pgfmathsetmacro{\dx}{sin(\mTheta)*sin(\mPhi)}%
+  \pgfmathsetmacro{\dy}{-sin(\mTheta)*cos(\mPhi)}%
   \pgfmathsetmacro{\dz}{cos(\mTheta)}%
+  % Dot products for visibility: (C + r(u cos t + v sin t)) . D > 0
   \pgfmathsetmacro{\Av}{\ux*\dx+\uy*\dy+\uz*\dz}%
   \pgfmathsetmacro{\Bv}{\vx*\dx+\vy*\dy+\vz*\dz}%
-  \pgfmathsetmacro{\tvis}{atan2(\Bv,\Av)}%
-  \pgfmathsetmacro{\tA}{\tvis-90}\pgfmathsetmacro{\tB}{\tvis+90}\pgfmathsetmacro{\tC}{\tvis+270}%
-  \draw[#8] plot[domain=\tA:\tB,samples=60,smooth,variable=\t]
-    ({(#1)+(#7)*(\ux*cos(\t)+\vx*sin(\t))},
-     {(#2)+(#7)*(\uy*cos(\t)+\vy*sin(\t))},
-     {(#3)+(#7)*(\uz*cos(\t)+\vz*sin(\t))});
-  \begin{pgfonlayer}{back}
-    \draw[#9] plot[domain=\tB:\tC,samples=60,smooth,variable=\t]
-      ({(#1)+(#7)*(\ux*cos(\t)+\vx*sin(\t))},
-       {(#2)+(#7)*(\uy*cos(\t)+\vy*sin(\t))},
-       {(#3)+(#7)*(\uz*cos(\t)+\vz*sin(\t))});
-  \end{pgfonlayer}
+  \pgfmathsetmacro{\CvD}{(#1)*\dx+(#2)*\dy+(#3)*\dz}%
+  \pgfmathsetmacro{\Lv}{sqrt(\Av*\Av + \Bv*\Bv + 0.000001)}%
+  \pgfmathsetmacro{\Argv}{min(1, max(-1, -\CvD / (#7 * \Lv)))}%
+  \pgfmathsetmacro{\alphav}{atan2(\Bv, \Av)}%
+  \pgfmathsetmacro{\dalpha}{acos(\Argv)}%
+  % Visibility range [alpha - dalpha, alpha + dalpha]
+  \pgfmathsetmacro{\tA}{\alphav - \dalpha}%
+  \pgfmathsetmacro{\tB}{\alphav + \dalpha}%
+  \pgfmathsetmacro{\tC}{\tA + 360}%
+  % Check if circle is entirely visible or hidden
+  \pgfmathparse{-\CvD / (#7 * \Lv) < -1 ? 1 : 0}\let\allVis\pgfmathresult
+  \pgfmathparse{-\CvD / (#7 * \Lv) > 1 ? 1 : 0}\let\allHid\pgfmathresult
+  \ifnum\allVis=1
+    \draw[#8] plot[domain=0:360,samples=80,smooth,variable=\t]
+      ({(#1)+(#7)*(\ux*cos(\t)+\vx*sin(\t))},{(#2)+(#7)*(\uy*cos(\t)+\vy*sin(\t))},{(#3)+(#7)*(\uz*cos(\t)+\vz*sin(\t))});
+  \else\ifnum\allHid=1
+    \begin{pgfonlayer}{back}
+      \draw[#9] plot[domain=0:360,samples=80,smooth,variable=\t]
+        ({(#1)+(#7)*(\ux*cos(\t)+\vx*sin(\t))},{(#2)+(#7)*(\uy*cos(\t)+\vy*sin(\t))},{(#3)+(#7)*(\uz*cos(\t)+\vz*sin(\t))});
+    \end{pgfonlayer}
+  \else
+    \draw[#8] plot[domain=\tA:\tB,samples=80,smooth,variable=\t]
+      ({(#1)+(#7)*(\ux*cos(\t)+\vx*sin(\t))},{(#2)+(#7)*(\uy*cos(\t)+\vy*sin(\t))},{(#3)+(#7)*(\uz*cos(\t)+\vz*sin(\t))});
+    \begin{pgfonlayer}{back}
+      \draw[#9] plot[domain=\tB:\tC,samples=80,smooth,variable=\t]
+        ({(#1)+(#7)*(\ux*cos(\t)+\vx*sin(\t))},{(#2)+(#7)*(\uy*cos(\t)+\vy*sin(\t))},{(#3)+(#7)*(\uz*cos(\t)+\vz*sin(\t))});
+    \end{pgfonlayer}
+  \fi\fi
   \endgroup
 }
 
