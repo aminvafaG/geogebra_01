@@ -10,8 +10,9 @@ slider values stored inside the `.ggb`.
 
 | File | Purpose |
 |---|---|
-| `helal.tex` | Hand-written tikz-3dplot source. Renders only objects that have `show object="true"` in the GGB 3-D view. |
-| `ggb2pdf.py` | Reads the current `.ggb`, pulls slider + view angles, runs `xelatex` with overrides, drops the PDF next to the `.ggb`. |
+| `ggb2pdf.py` | **Generator.** Reads the `.ggb`, extracts every visible point's 3-D coordinates, builds each circle/segment/arc from those coordinates, writes `helal.tex`, and runs `xelatex`. The PDF lands next to the `.ggb`. |
+| `helal.tex` | **Auto-generated** — overwritten on every run. Don't hand-edit for permanent changes; edit `ggb2pdf.py` instead. |
+| `PIPELINE.md` | Detailed guide: how the pipeline works internally, and how to fix any mismatch between the GGB view and the PDF. **Read this before modifying the code.** |
 | `rebuild.bat` | Double-click wrapper for `ggb2pdf.py --open`. |
 | `animate.ps1` | Sweep one parameter to render an animation. |
 
@@ -74,3 +75,13 @@ whatsoever. Without an in-app vector exporter, the only options are this
 pipeline or hand-converting in another tool entirely (Mathematica,
 MetaPost, Cinderella). This pipeline was the cheapest route that keeps you
 authoring inside GeoGebra.
+
+## When something looks wrong in the PDF
+
+Open [`PIPELINE.md`](PIPELINE.md). It documents:
+
+- the data flow `.ggb → XML → Python → TikZ → PDF`;
+- exactly which `ggb2pdf.py` block draws each visible object;
+- the visibility / hidden-line algorithm;
+- a troubleshooting checklist for mismatches (parallel circles, swapped
+  arc directions, missing/extra objects, label collisions, camera tilt).
