@@ -34,6 +34,7 @@
 \providecommand{\TaghvimGhamar}{0}
 \providecommand{\mTheta}{72}
 \providecommand{\mPhi}{110}
+\providecommand{\mShowAxes}{0}
 \providecommand{\showInner}{0}
 \providecommand{\showLabels}{1}
 
@@ -270,6 +271,25 @@
 \draw[->,thick,black] (Zen) -- ($(Zen)+(0,0,0.30*\R)$);      % u_1
 \draw[->,blue,thick]  (Np)  -- (NpV);                        % v_1
 \draw[->,blue,thick]  (Sp)  -- (SpV);                        % w_1
+
+% --- LAYER 6: coordinate axes (if visible in GGB) -----------------
+\ifnum\mShowAxes=1
+  % Define axis scale factor relative to sphere radius
+  \pgfmathsetmacro{\axisScale}{0.35}
+  \pgfmathsetmacro{\axisLen}{\R * \axisScale}
+  
+  % X axis (red)
+  \draw[->,thick,red]   (O) -- (\axisLen, 0, 0);
+  \node[font=\footnotesize, color=red] at (\axisLen*1.15, 0, 0) {$X$};
+  
+  % Y axis (green)
+  \draw[->,thick,green] (O) -- (0, \axisLen, 0);
+  \node[font=\footnotesize, color=green] at (0, \axisLen*1.15, 0) {$Y$};
+  
+  % Z axis (blue)
+  \draw[->,thick,blue]  (O) -- (0, 0, \axisLen);
+  \node[font=\footnotesize, color=blue] at (0, 0, \axisLen*1.15) {$Z$};
+\fi
 
 % --- LAYER 8: visible point dots --------------------------------
 \begin{pgfonlayer}{front}

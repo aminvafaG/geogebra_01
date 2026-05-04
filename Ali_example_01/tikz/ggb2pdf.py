@@ -49,7 +49,7 @@ SLIDER_MAP = {
 #   different reference axis than tikz-3dplot's phi (which is CCW from +x).
 #   Override on the command line with --theta / --phi if your model uses a
 #   different default view convention.
-def view_from_ggb(xml: str) -> tuple[float, float] | None:
+def view_from_ggb(xml: str) -> tuple[float, float, bool] | None:
     m = re.search(r'<euclidianView3D>.*?<coordSystem[^/]*xAngle="([\-0-9.eE]+)"'
                   r'\s+zAngle="([\-0-9.eE]+)"', xml, re.S)
     if not m:
@@ -57,8 +57,15 @@ def view_from_ggb(xml: str) -> tuple[float, float] | None:
     x_ang = float(m.group(1))
     z_ang = float(m.group(2)) % 360.0
     theta = 90.0 - x_ang
-    phi   = (270.0 - z_ang) % 360.0
-    return theta, phi
+    phi   = (150 - z_ang) % 360.0
+
+    # Extract axes visibility state (checking X-axis as proxy for all)
+    show_axes = False
+    ax_m = re.search(r'<euclidianView3D>.*?<axis\s+id="0"[^>]*show="(true|false)"', xml, re.S)
+    if ax_m:
+        show_axes = ax_m.group(1) == "true"
+
+    return theta, phi, show_axes
 
 
 def read_slider_values(xml: str) -> dict[str, float]:
@@ -91,11 +98,13 @@ def build_overrides(ggb_path: Path) -> tuple[str, dict[str, float]]:
 
     view = view_from_ggb(xml)
     if view is not None:
-        theta, phi = view
+        theta, phi, show_axes = view
         parts.append(rf"\def\mTheta{{{theta:.3f}}}")
         parts.append(rf"\def\mPhi{{{phi:.3f}}}")
+        parts.append(rf"\def\mShowAxes{{{1 if show_axes else 0}}}")
         used["xAngle->mTheta"] = theta
         used["zAngle->mPhi"]   = phi
+        used["showAxes"]       = 1.0 if show_axes else 0.0
 
     return "".join(parts), used
 
