@@ -46,7 +46,9 @@
       "Bash(pdftoppm -r 120 -png Final_Helal_1404_BSe_BMo.pdf /c/Users/aminv/Documents/geogebra_01/Ali_example_01/tikz/_curr)",
       "Bash(python tikz/ggb2pdf.py)",
       "Bash(rm -f tikz/_curr-1.png)",
-      "Bash(pdftoppm -r 130 -png Final_Helal_1404_BSe_BMo.pdf tikz/_curr)"
+      "Bash(pdftoppm -r 130 -png Final_Helal_1404_BSe_BMo.pdf tikz/_curr)",
+      "Bash(pdftoppm -r 150 -png Final_Helal_1404_BSe_BMo.pdf tikz/_curr)",
+      "Bash(pdftoppm -r 200 -png Final_Helal_1404_BSe_BMo.pdf tikz/_curr)"
     ],
     "additionalDirectories": [
       "C:\\Users\\aminv\\Documents\\geogebra_01\\Ali_example_01"

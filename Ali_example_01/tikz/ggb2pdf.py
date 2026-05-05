@@ -360,6 +360,10 @@ LABEL_DECOR = {  # label, anchor, offset, persian text
     "Shams":("above",      "4pt", "شمس"),
     "MozeGhamar":("left",  "4pt", "مو قمر"),
     "Ghamar":("right",     "3pt", "قمر"),
+    "Ghamar'":     ("right",      "3pt", "ن قمر"),
+    "Shams'":      ("above",      "4pt", "ن شمس"),
+    "GhamarMoaddal": ("below",    "3pt", "قمر معدل"),
+    "GhamarMoaddal'": ("above",   "3pt", "ن قمر معدل"),
 }
 
 POINT_STYLE = {  # label -> (color, size_pt, draw_label_in_3d)
@@ -383,6 +387,30 @@ POINT_STYLE = {  # label -> (color, size_pt, draw_label_in_3d)
     "G":  ("gray!60!black", "1", False),
     "K":  ("gray!60!black", "1", False),
     "M":  ("gray!60!black", "1", False),
+    # Conditional points (rendered only when their boolean is true) ---
+    "Ghamar'":        ("orange",         "2.4", True),   # cond f_1
+    "Shams'":         ("orange",         "2.4", True),   # cond s
+    "GhamarMoaddal":  ("white",          "2.0", True),   # cond b_1
+    "GhamarMoaddal'": ("white",          "2.0", True),   # cond e_1
+    "Ghareb'":        ("gray!60!black",  "1.4", False),  # cond j
+    "H":              ("blue!50!black",  "1.6", False),  # cond r (z-axis point)
+    "I":              ("blue!50!black",  "1.6", False),  # cond r (z-axis point)
+    "L":              ("orange",         "2.4", False),  # cond r (moon image on inner sphere)
+    "J":              ("red",            "2.4", False),  # cond r (apparent moon position)
+}
+
+# Which booleans guard which conditional points (for visibility filtering)
+POINT_BOOL = {
+    "Ghamar'":        "f_1",
+    "Shams'":         "s",
+    "GhamarMoaddal":  "b_1",
+    "GhamarMoaddal'": "e_1",
+    "Ghareb'":        "j",
+    "H":              "r",
+    "I":              "r",
+    "L":              "r",
+    "J":              "r",
+    "MagharebGhamr":  "e",
 }
 
 
@@ -508,6 +536,22 @@ def build_scene(ggb_path, theta_deg, phi_deg, show_axes_override=None):
             c = circle_from_3pts(pts["Zenith"], pts["NpM"], pts["Nadir"])
             emit_circle(out, c, D, "black", "black", lw_solid=0.5, lw_dashed=0.4)
 
+    # c_1 (apparent latitude circle): Circle[NpM, NPM', J] - bool 'w'
+    if bools.get("w", False) and all(k in pts for k in ("NpM", "NPM'", "J")):
+        c = circle_from_3pts(pts["NpM"], pts["NPM'"], pts["J"])
+        emit_circle(out, c, D, "red", "red", lw_solid=0.5, lw_dashed=0.4)
+
+    # C_ertefa5 (altitude=5° circle): Circle[Line_Ofogh, W'_1] - bool 'h_1'
+    # Line_Ofogh is the z-axis; circle is the parallel through W'_1
+    if bools.get("h_1", False) and "W'_{1}" in pts:
+        c = circle_axis_through((0.0, 0.0, 1.0), pts["W'_{1}"])
+        emit_circle(out, c, D, "black", "black", lw_solid=0.4, lw_dashed=0.35)
+
+    # C_ertefa8 (altitude=8° circle): Circle[Line_Ofogh, W'] - bool 'g_1'
+    if bools.get("g_1", False) and "W'" in pts:
+        c = circle_axis_through((0.0, 0.0, 1.0), pts["W'"])
+        emit_circle(out, c, D, "black", "black", lw_solid=0.4, lw_dashed=0.35)
+
     # ------- Visible arc Arc_ArzGhamar (q=true) -------
     if bools.get("q", True):
         if "Ghamar" in pts and "MozeGhamar" in pts:
@@ -526,6 +570,12 @@ def build_scene(ggb_path, theta_deg, phi_deg, show_axes_override=None):
         emit_segment(out, pts["W"], O, D, "black", 0.5)
     if "MagharebGhamr" in pts and bools.get("e", True):
         emit_segment(out, pts["MagharebGhamr"], O, D, "black", 0.5)
+    # Segment h: A -> Ghamar (bool 'r')
+    if bools.get("r", False) and "Ghamar" in pts:
+        emit_segment(out, O, pts["Ghamar"], D, "red", 0.7)
+    # Segment k: H -> J (bool 'r')
+    if bools.get("r", False) and "H" in pts and "J" in pts:
+        emit_segment(out, pts["H"], pts["J"], D, "red", 0.7)
     # k_1: Ghamar -> G,  l_1: K -> G
     # Compute G, K, M from intersections (independent of helper pts that may be hidden)
     if all(k in pts for k in ("Np", "Ghamar")):
@@ -597,25 +647,64 @@ def build_scene(ggb_path, theta_deg, phi_deg, show_axes_override=None):
             P = rotate_axis(pts["Hamal"], pts["NpM"], -float(k))
             emit_point(out, P, "yellow!70!orange", "1.2", D)
 
+    # ------- Inner concentric spheres b, d (bool 'r' = "موضع مرئی") -------
+    # b uses point H, d uses point I (both on z-axis); radius = |point|.
+    # Drawn as flat shaded disks in screen coords on the back pgflayer.
+    # Emitting them HERE (after all back arcs have been added to the back
+    # layer in source order) means within the back layer they paint AFTER
+    # the dashed back arcs, so they correctly obscure those arcs.
+    if bools.get("r", False):
+        if "I" in pts:
+            r_d = norm(pts["I"])
+            out.append(r"\begin{pgfonlayer}{back}")
+            out.append(r"\begin{scope}[tdplot_screen_coords]")
+            out.append(rf"\shade[ball color=yellow!40!green,opacity=0.55] (0,0) circle ({fmt(r_d)});")
+            out.append(r"\end{scope}")
+            out.append(r"\end{pgfonlayer}")
+        if "H" in pts:
+            r_b = norm(pts["H"])
+            out.append(r"\begin{pgfonlayer}{back}")
+            out.append(r"\begin{scope}[tdplot_screen_coords]")
+            out.append(rf"\shade[ball color=cyan!50!blue,opacity=0.90] (0,0) circle ({fmt(r_b)});")
+            out.append(r"\end{scope}")
+            out.append(r"\end{pgfonlayer}")
+        out.append("")
+
     # ------- Points -------
     out.append(r"% --- points ---")
     for label, (color, sz, _) in POINT_STYLE.items():
-        if label in pts:
-            P = pts[label]
-            emit_point(out, P, color, sz, D)
+        if label not in pts:
+            continue
+        # If the point is gated by a boolean, only render it when the
+        # boolean is true.  Default for unknown booleans is False so we
+        # don't accidentally draw a hidden point.
+        guard = POINT_BOOL.get(label)
+        if guard is not None and not bools.get(guard, False):
+            continue
+        emit_point(out, pts[label], color, sz, D)
 
     # ------- Persian labels -------
     out.append(r"% --- labels ---")
     for label, (anchor, offset, txt) in LABEL_DECOR.items():
-        if label in pts:
-            P = pts[label]
-            emit_label(out, P, txt, anchor=anchor, offset=offset)
-    # G, K, M small text labels
+        if label not in pts:
+            continue
+        guard = POINT_BOOL.get(label)
+        if guard is not None and not bools.get(guard, False):
+            continue
+        emit_label(out, pts[label], txt, anchor=anchor, offset=offset)
+    # G, K, M small text labels (always visible when present)
     for lbl in ("G", "K", "M"):
         if lbl in pts:
             P = pts[lbl]
             anchor = {"G": "above right", "K": "below", "M": "above"}[lbl]
             emit_label_text(out, P, f"${lbl}$", anchor=anchor, offset="1pt")
+    # H, I, L, J letter labels (only when bool 'r' is true)
+    if bools.get("r", False):
+        for lbl, anchor in (("H", "left"), ("I", "left"),
+                            ("L", "above right"), ("J", "below right")):
+            if lbl in pts:
+                emit_label_text(out, pts[lbl], f"${lbl}$",
+                                anchor=anchor, offset="2pt")
 
     return "\n".join(out)
 

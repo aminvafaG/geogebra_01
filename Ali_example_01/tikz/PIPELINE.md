@@ -214,6 +214,13 @@ a GGB object to the lines in `ggb2pdf.py` that draw it.
 | `C_ArzGhamar` | circle | `Circle[NpM, NPM', MozeGhamar]` | `circle_from_3pts(...)`. Conditional on **`m`**. |
 | `C_Arzghamr*` | circle pair | mirrored ±6° rotations of Hamal | rotate `Hamal` by ±6° around `NpM`. Conditional on **`o`**. |
 | `C_vasatAssama` | circle | `Circle[Zenith, NpM, Nadir]` | `circle_from_3pts(...)`. Conditional on **`d_1`**. |
+| `c_1` | circle | `Circle[NpM, NPM', J]` (apparent latitude) | `circle_from_3pts(NpM, NPM', J)`. Conditional on **`w`**. |
+| `C_ertefa5` | small circle | `Circle[zAxis, W'_1]` (altitude 5°) | `circle_axis_through((0,0,1), pts["W'_{1}"])`. Conditional on **`h_1`**. |
+| `C_ertefa8` | small circle | `Circle[zAxis, W']` (altitude 8°) | `circle_axis_through((0,0,1), pts["W'"])`. Conditional on **`g_1`**. |
+| `b` | inner sphere | `Sphere[A, H]` (radius `\|H\|`) | flat shaded disk in screen coords, back layer. Conditional on **`r`**. |
+| `d` | inner sphere | `Sphere[A, I]` (radius `\|I\|`) | flat shaded disk in screen coords, back layer. Conditional on **`r`**. |
+| `h` | segment | `Segment[A, Ghamar]` (red) | `emit_segment(O, Ghamar, …)`. Conditional on **`r`**. |
+| `k` | segment | `Segment[H, J]` (red) | `emit_segment(H, J, …)`. Conditional on **`r`**. |
 | `Arc_ArzGhamar` | arc | `CircleArc[A, Ghamar, MozeGhamar]` | `arc_through_2pts((0,0,0), Ghamar, MozeGhamar)`. Conditional on **`q`**. |
 | `j_1` | segment | `Segment[W, A]` | `emit_segment(pts["W"], O, …)` |
 | `i_1` | segment | `Segment[MagharebGhamr, A]` | `emit_segment(pts["MagharebGhamr"], O, …)`. Conditional on **`e`**. |
@@ -380,6 +387,30 @@ Edit the `POINT_STYLE` dictionary, e.g.:
 ```python
 "Shams": ("orange", "2.4", True),    # color, size in pt, has_persian_label
 ```
+
+### 8.5b "A conditional point appears even when its checkbox is off"
+
+Conditional points are gated by the `POINT_BOOL` dictionary. Each entry
+maps a point label to the GGB boolean that controls its visibility:
+
+```python
+POINT_BOOL = {
+    "Ghamar'":        "f_1",
+    "Shams'":         "s",
+    "GhamarMoaddal":  "b_1",
+    "GhamarMoaddal'": "e_1",
+    "Ghareb'":        "j",
+    "H":              "r",
+    "I":              "r",
+    "L":              "r",
+    "J":              "r",
+    "MagharebGhamr":  "e",
+}
+```
+
+If you add a new point that should depend on a checkbox, add the
+mapping here. Both the dot and its Persian label (if any in
+`LABEL_DECOR`) will be skipped when the boolean is false.
 
 ### 8.6 "An object I toggled in GeoGebra still shows / never shows in the PDF"
 
