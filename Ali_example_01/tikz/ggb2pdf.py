@@ -95,6 +95,61 @@ def extract_booleans(root):
     return out
 
 
+def extract_styles(root):
+    """Read per-object render style from <element>: line thickness,
+    typeHidden flag (0=Invisible, 1=Unchanged, 2=Dashed), and the object's
+    color + alpha (where alpha is the surface fill opacity for conics).
+
+    Returns label -> dict with keys:
+        thickness  : int (1..)
+        typeHidden : 0 | 1 | 2
+        type       : 0 (solid) | 10 (dashed) | ... pgf line dash style
+        rgb        : (r, g, b) ints in 0..255
+        alpha      : float in 0..1
+    """
+    out = {}
+    for el in root.iter("element"):
+        if el.get("type") not in ("conic3d", "conicpart", "segment3d",
+                                   "vector3d", "ray3d", "line3d", "quadric"):
+            continue
+        ls = el.find("lineStyle")
+        col = el.find("objColor")
+        if ls is None or col is None:
+            continue
+        try:
+            out[el.get("label")] = {
+                "thickness":  int(ls.get("thickness", "5")),
+                "typeHidden": int(ls.get("typeHidden", "0")),
+                "type":       int(ls.get("type", "0")),
+                "rgb":        (int(col.get("r", "0")),
+                               int(col.get("g", "0")),
+                               int(col.get("b", "0"))),
+                "alpha":      float(col.get("alpha", "0")),
+            }
+        except (TypeError, ValueError):
+            continue
+    return out
+
+
+# GGB thickness -> TikZ pt: empirical mapping.
+# thickness  1   2   3   4   5   6   7
+#   pt      0.3 0.5 0.7 0.9 1.1 1.3 1.5
+def thickness_to_pt(t):
+    return max(0.3, 0.2 + 0.18 * t)
+
+
+def rgb_color(rgb):
+    """Format an RGB triple as a TikZ xcolor expression."""
+    r, g, b = rgb
+    return f"{{rgb,255:red,{r};green,{g};blue,{b}}}"
+
+
+# typeHidden constants (mirror GGB's hidden-line-style radio buttons)
+HIDDEN_INVISIBLE = 0
+HIDDEN_UNCHANGED = 1
+HIDDEN_DASHED    = 2
+
+
 def extract_line_dirs(root):
     """Return label -> 3-D unit direction for every <line3d>/<ray3d>.
 
@@ -289,32 +344,86 @@ def fmt(x):
     return f"{x:.5f}"
 
 
-def emit_circle(out, circle, D, color_solid, color_dashed, lw_solid=1.0, lw_dashed=0.7,
-                t_start=0.0, t_end=360.0, samples_full=80, opacity_back=0.55):
+def _circle_path(C, u, v, r, a, b, ns):
+    """TikZ parametric `plot` clause for a circle arc segment in 3-D."""
+    return (f"plot[domain={a:.4f}:{b:.4f},samples={ns},smooth,variable=\\t] "
+            f"({{{fmt(C[0])}+{fmt(r)}*({fmt(u[0])}*cos(\\t)+{fmt(v[0])}*sin(\\t))}},"
+            f"{{{fmt(C[1])}+{fmt(r)}*({fmt(u[1])}*cos(\\t)+{fmt(v[1])}*sin(\\t))}},"
+            f"{{{fmt(C[2])}+{fmt(r)}*({fmt(u[2])}*cos(\\t)+{fmt(v[2])}*sin(\\t))}})")
+
+
+def emit_circle(out, circle, D, color, lw=1.0,
+                t_start=0.0, t_end=360.0, samples_full=80,
+                hidden_style=HIDDEN_DASHED,
+                hidden_opacity=0.55,
+                fill_alpha=0.0,
+                fill_layer="midback"):
+    """Emit a 3-D circle/arc.
+
+    Parameters mirror GGB's per-object style:
+      - color       : TikZ color expression (e.g. \"red\" or rgb_color(rgb))
+      - lw          : stroke width in pt (use thickness_to_pt(thickness))
+      - hidden_style: HIDDEN_INVISIBLE / HIDDEN_UNCHANGED / HIDDEN_DASHED
+      - fill_alpha  : 0..1, the conic's surface alpha. >0 paints a filled
+                      disk in screen coords using the same parametric path.
+      - fill_layer  : pgflayer for the filled disk ('main' draws it on top
+                      of back arcs but below front-arc strokes).
+    """
     if circle is None:
         return
     C, u, v, r = circle["C"], circle["u"], circle["v"], circle["r"]
+
+    # ------- Disk fill (only for full circles, alpha > 0) -------
+    # We close the parametric path with `--cycle` so TikZ fills the
+    # projected ellipse. Disk fills go on `fill_layer` (midback) so they
+    # sit BETWEEN the back-arc strokes and the front-arc strokes.
+    # GGB caps the apparent fill at ~85% even when alpha=1.0, so we cap
+    # likewise (matches "even at 100% it's still a bit transparent").
+    if fill_alpha > 0.0 and abs((t_end - t_start) - 360.0) < 1e-3:
+        ns = max(48, samples_full)
+        path = _circle_path(C, u, v, r, 0.0, 360.0, ns)
+        eff_alpha = min(0.85, fill_alpha)
+        if fill_layer != "main":
+            out.append(rf"\begin{{pgfonlayer}}{{{fill_layer}}}")
+        out.append(rf"\fill[color={color},opacity={eff_alpha:.3f}] {path} -- cycle;")
+        if fill_layer != "main":
+            out.append(r"\end{pgfonlayer}")
+
+    # ------- Outline (front + hidden parts per typeHidden) -------
     intervals = split_visibility(C, u, v, r, D, t_start, t_end)
     for (a, b, vis) in intervals:
         span = b - a
         if span < 0.05:
             continue
         ns = max(8, int(samples_full * span / 360))
-        path = (f"plot[domain={a:.4f}:{b:.4f},samples={ns},smooth,variable=\\t] "
-                f"({{{fmt(C[0])}+{fmt(r)}*({fmt(u[0])}*cos(\\t)+{fmt(v[0])}*sin(\\t))}},"
-                f"{{{fmt(C[1])}+{fmt(r)}*({fmt(u[1])}*cos(\\t)+{fmt(v[1])}*sin(\\t))}},"
-                f"{{{fmt(C[2])}+{fmt(r)}*({fmt(u[2])}*cos(\\t)+{fmt(v[2])}*sin(\\t))}})")
+        path = _circle_path(C, u, v, r, a, b, ns)
         if vis:
-            out.append(f"\\draw[{color_solid},line width={lw_solid}pt] {path};")
+            out.append(rf"\draw[color={color},line width={lw}pt] {path};")
         else:
-            out.append("\\begin{pgfonlayer}{back}")
-            out.append(f"\\draw[{color_dashed},line width={lw_dashed}pt,dashed,opacity={opacity_back}] {path};")
-            out.append("\\end{pgfonlayer}")
+            if hidden_style == HIDDEN_INVISIBLE:
+                continue
+            elif hidden_style == HIDDEN_UNCHANGED:
+                # Same stroke as the front, but on the back layer so any
+                # opaque object in front (e.g. inner sphere) still wins.
+                out.append(r"\begin{pgfonlayer}{back}")
+                out.append(rf"\draw[color={color},line width={lw}pt] {path};")
+                out.append(r"\end{pgfonlayer}")
+            else:  # HIDDEN_DASHED
+                out.append(r"\begin{pgfonlayer}{back}")
+                lw_dashed = max(0.3, lw * 0.75)
+                out.append(rf"\draw[color={color},line width={lw_dashed:.2f}pt,"
+                           rf"dashed,opacity={hidden_opacity}] {path};")
+                out.append(r"\end{pgfonlayer}")
 
 
-def emit_segment(out, P1, P2, D, color, lw, dash_lw=None, opacity_back=0.4):
-    if dash_lw is None:
-        dash_lw = lw * 0.75
+def emit_segment(out, P1, P2, D, color, lw,
+                 hidden_style=HIDDEN_DASHED, hidden_opacity=0.4):
+    """Emit a 3-D line segment with proper hidden-line handling.
+
+    The segment is split at the sphere silhouette plane (`P · D = 0`).
+    The portion on the front hemisphere is drawn solid; the back portion
+    follows `hidden_style` exactly like `emit_circle`.
+    """
     d1 = dot(P1, D)
     d2 = dot(P2, D)
 
@@ -322,11 +431,20 @@ def emit_segment(out, P1, P2, D, color, lw, dash_lw=None, opacity_back=0.4):
         coords = (f"({fmt(A[0])},{fmt(A[1])},{fmt(A[2])}) -- "
                   f"({fmt(B[0])},{fmt(B[1])},{fmt(B[2])})")
         if vis:
-            out.append(f"\\draw[{color},line width={lw}pt] {coords};")
+            out.append(rf"\draw[color={color},line width={lw}pt] {coords};")
         else:
-            out.append("\\begin{pgfonlayer}{back}")
-            out.append(f"\\draw[{color},line width={dash_lw}pt,dashed,opacity={opacity_back}] {coords};")
-            out.append("\\end{pgfonlayer}")
+            if hidden_style == HIDDEN_INVISIBLE:
+                return
+            if hidden_style == HIDDEN_UNCHANGED:
+                out.append(r"\begin{pgfonlayer}{back}")
+                out.append(rf"\draw[color={color},line width={lw}pt] {coords};")
+                out.append(r"\end{pgfonlayer}")
+            else:  # HIDDEN_DASHED
+                lw_d = max(0.3, lw * 0.75)
+                out.append(r"\begin{pgfonlayer}{back}")
+                out.append(rf"\draw[color={color},line width={lw_d:.2f}pt,"
+                           rf"dashed,opacity={hidden_opacity}] {coords};")
+                out.append(r"\end{pgfonlayer}")
 
     if d1 >= 0 and d2 >= 0:
         emit_part(P1, P2, True)
@@ -346,7 +464,7 @@ def emit_segment(out, P1, P2, D, color, lw, dash_lw=None, opacity_back=0.4):
 
 
 def emit_vector(out, P1, P2, color, lw):
-    out.append(f"\\draw[->,>=Latex,line width={lw}pt,{color}] "
+    out.append(rf"\draw[->,>=Latex,line width={lw}pt,color={color}] "
                f"({fmt(P1[0])},{fmt(P1[1])},{fmt(P1[2])}) -- "
                f"({fmt(P2[0])},{fmt(P2[1])},{fmt(P2[2])});")
 
@@ -447,10 +565,46 @@ def build_scene(ggb_path, theta_deg, phi_deg, show_axes_override=None):
     pts = extract_points(root)
     bools = extract_booleans(root)
     line_dirs = extract_line_dirs(root)
+    styles = extract_styles(root)
     cam_x, cam_z, cam_axes = extract_camera(root)
 
     R = extract_sphere_radius(pts)
     D = view_dir(theta_deg, phi_deg)
+
+    # Helper that pulls a GGB-stored style and produces emit-ready params.
+    # If a label has no entry, falls back to a sensible default.
+    DEFAULT_STYLE = {"thickness": 5, "typeHidden": HIDDEN_DASHED, "type": 0,
+                     "rgb": (0, 0, 0), "alpha": 0.0}
+
+    def style(label):
+        s = styles.get(label, DEFAULT_STYLE)
+        return {
+            "color":        rgb_color(s["rgb"]),
+            "lw":           thickness_to_pt(s["thickness"]),
+            "hidden_style": s["typeHidden"],
+            "fill_alpha":   s["alpha"],
+            "thickness":    s["thickness"],
+        }
+
+    def draw_circle(label, circle, **overrides):
+        """Look up GGB style for `label` and emit the circle with it."""
+        if circle is None:
+            return
+        s = style(label)
+        s.update(overrides)
+        emit_circle(out, circle, D,
+                    color=s["color"], lw=s["lw"],
+                    hidden_style=s["hidden_style"],
+                    fill_alpha=s["fill_alpha"],
+                    t_start=s.get("t_start", 0.0),
+                    t_end=s.get("t_end", 360.0),
+                    samples_full=s.get("samples_full", 80))
+
+    def draw_segment(label, P1, P2):
+        s = style(label)
+        emit_segment(out, P1, P2, D,
+                     color=s["color"], lw=s["lw"],
+                     hidden_style=s["hidden_style"])
 
     show_axes = cam_axes if show_axes_override is None else show_axes_override
 
@@ -480,150 +634,121 @@ def build_scene(ggb_path, theta_deg, phi_deg, show_axes_override=None):
     out.append("")
 
     # ------- Circles (visible ones with conditional booleans honored) -------
+    # Every block below pulls its color, line thickness, hidden-line style
+    # (Invisible / Unchanged / Dashed) and surface alpha from the .ggb's
+    # <lineStyle> and <objColor>.  Editing those properties in GeoGebra
+    # propagates to the PDF on the next run.
     out.append(r"% --- 3D circles ---")
 
-    # C_ofogh: green, horizon, through E, S, W
+    # C_ofogh: horizon, through E, S, W (alpha=1.0 -> filled disk)
     if all(k in pts for k in ("E", "S", "W")):
-        c = circle_from_3pts(pts["E"], pts["S"], pts["W"])
-        emit_circle(out, c, D,
-                    "green!35!black", "green!35!black",
-                    lw_solid=1.2, lw_dashed=0.8)
+        draw_circle("C_ofogh", circle_from_3pts(pts["E"], pts["S"], pts["W"]))
 
-    # C_Moaddel: blue, through B', W, E (B' = rotation of B around y by Arz)
-    # Use B' from XML directly
+    # C_Moaddel: through B', W, E (B' = rotation of B around y by Arz)
     if "B'" in pts and "W" in pts and "E" in pts:
-        c = circle_from_3pts(pts["B'"], pts["W"], pts["E"])
-        emit_circle(out, c, D,
-                    "blue", "blue",
-                    lw_solid=1.1, lw_dashed=0.8)
+        draw_circle("C_Moaddel", circle_from_3pts(pts["B'"], pts["W"], pts["E"]))
 
-    # C_Mentaghe: violet, plane perpendicular to NpM through origin (great circle)
+    # C_Mentaghe: great circle perpendicular to NpM through origin
     if "NpM" in pts:
-        c = circle_great(pts["NpM"])
-        c["r"] = R
-        emit_circle(out, c, D,
-                    "violet", "violet",
-                    lw_solid=1.1, lw_dashed=0.8)
+        c = circle_great(pts["NpM"]); c["r"] = R
+        draw_circle("C_Mentaghe", c)
 
-    # C_nesf: red, meridian through S, B, N (B is on z-axis above origin)
-    if "S" in pts and "N" in pts and "B" in pts:
-        c = circle_from_3pts(pts["S"], pts["B"], pts["N"])
-        emit_circle(out, c, D,
-                    "red", "red",
-                    lw_solid=1.0, lw_dashed=0.7, opacity_back=0.45)
+    # C_nesf: meridian through S, B, N
+    if all(k in pts for k in ("S", "N", "B")):
+        draw_circle("C_nesf", circle_from_3pts(pts["S"], pts["B"], pts["N"]))
 
-    # C_yomiGhamar: dark red, axis = Line_moaddel direction (= Np), through Ghamar
+    # C_yomiGhamar: small circle around Line_moaddel through Ghamar
     if "Np" in pts and "Ghamar" in pts:
-        c = circle_axis_through(pts["Np"], pts["Ghamar"])
-        emit_circle(out, c, D,
-                    "red!50!black", "red!50!black",
-                    lw_solid=0.6, lw_dashed=0.5, opacity_back=0.45)
+        draw_circle("C_yomiGhamar",
+                    circle_axis_through(pts["Np"], pts["Ghamar"]))
 
-    # C_ofoghTaksiryGhamar: red, through MagharebGhamr, Ghamar, -Ghamar
-    # Conditional: bool 'e' (افق تکثیری قمر)
-    if bools.get("e", True):
-        if "MagharebGhamr" in pts and "Ghamar" in pts:
-            ghm_neg = scale(pts["Ghamar"], -1.0)
-            c = circle_from_3pts(pts["MagharebGhamr"], pts["Ghamar"], ghm_neg)
-            emit_circle(out, c, D,
-                        "red", "red",
-                        lw_solid=0.9, lw_dashed=0.6, opacity_back=0.45)
+    # C_ofoghTaksiryGhamar - bool 'e'
+    if bools.get("e", True) and "MagharebGhamr" in pts and "Ghamar" in pts:
+        ghm_neg = scale(pts["Ghamar"], -1.0)
+        draw_circle("C_ofoghTaksiryGhamar",
+                    circle_from_3pts(pts["MagharebGhamr"], pts["Ghamar"], ghm_neg))
 
     # C_BodeMoaddal9 = Rotate[C_ofogh, -9°, Line_moaddel] - bool 'l'
-    # We MUST rotate around Line_moaddel's stored direction (not pts["Np"]):
-    # GGB stores `Line_moaddel` direction as approximately (cos(Arz), 0, -sin(Arz)),
-    # while Np is the *antipodal* intersection of that line with the sphere.
-    # Using pts["Np"] flips the rotation handedness and rotates the horizon by
-    # +9° instead of -9°, which lands the circle on the wrong side.
+    # Rotate around Line_moaddel's stored direction (NOT pts["Np"], which
+    # is antiparallel and would flip the rotation handedness).
     if bools.get("l", False) and "Line_moaddel" in line_dirs and "E" in pts:
         ax = line_dirs["Line_moaddel"]
         E2 = rotate_axis(pts["E"], ax, -9.0)
         S2 = rotate_axis(pts["S"], ax, -9.0)
         W2 = rotate_axis(pts["W"], ax, -9.0)
-        c = circle_from_3pts(E2, S2, W2)
-        emit_circle(out, c, D, "red", "red", lw_solid=0.4, lw_dashed=0.35)
+        draw_circle("C_BodeMoaddal9", circle_from_3pts(E2, S2, W2))
 
-    # C_boadSeva9: Circle[NpM, Ghareb', NPM']  (great circle, bool 'j')
-    # Use the Ghareb' point that GGB already stored, rather than
-    # recomputing the rotation, so the geometry exactly matches GGB.
+    # C_boadSeva9: Circle[NpM, Ghareb', NPM']  - bool 'j'
     if bools.get("j", False) and all(k in pts for k in ("NpM", "NPM'", "Ghareb'")):
-        c = circle_from_3pts(pts["NpM"], pts["Ghareb'"], pts["NPM'"])
-        emit_circle(out, c, D, "blue", "blue", lw_solid=0.4, lw_dashed=0.35)
+        draw_circle("C_boadSeva9",
+                    circle_from_3pts(pts["NpM"], pts["Ghareb'"], pts["NPM'"]))
 
     # C_ArzGhamar - bool 'm'
     if bools.get("m", False) and all(k in pts for k in ("NpM", "NPM'", "MozeGhamar")):
-        c = circle_from_3pts(pts["NpM"], pts["NPM'"], pts["MozeGhamar"])
-        emit_circle(out, c, D, "black", "black", lw_solid=0.4, lw_dashed=0.35)
+        draw_circle("C_ArzGhamar",
+                    circle_from_3pts(pts["NpM"], pts["NPM'"], pts["MozeGhamar"]))
 
     # C_Arzghamrmanfi6 = Circle[Line_mentaghe, Hamal'] - bool 'o'
-    # This is a SMALL CIRCLE around the NpM-axis (Line_mentaghe) passing
-    # through Hamal' (= Hamal rotated 6° around the axis perpendicular to
-    # the great circle NpM-Hamal-NPM').  It represents the +6° lunar-
-    # latitude parallel relative to the ecliptic.  Use Hamal' from XML.
+    # SMALL circle around NpM-axis through Hamal' (the +6° lunar-latitude
+    # parallel relative to the ecliptic).
     if bools.get("o", False) and "NpM" in pts and "Hamal'" in pts:
-        c = circle_axis_through(pts["NpM"], pts["Hamal'"])
-        emit_circle(out, c, D, "violet", "violet",
-                    lw_solid=0.4, lw_dashed=0.35)
-        # C_Arzghamr6 = Mirror[C_Arzghamrmanfi6, A]: same axis, opposite
-        # side of origin -> circle around NpM-axis through -Hamal'.
-        c2 = circle_axis_through(pts["NpM"], scale(pts["Hamal'"], -1.0))
-        emit_circle(out, c2, D, "violet", "violet",
-                    lw_solid=0.4, lw_dashed=0.35)
+        draw_circle("C_Arzghamrmanfi6",
+                    circle_axis_through(pts["NpM"], pts["Hamal'"]))
+        # C_Arzghamr6 = Mirror[C_Arzghamrmanfi6, A]: -6° parallel
+        draw_circle("C_Arzghamr6",
+                    circle_axis_through(pts["NpM"], scale(pts["Hamal'"], -1.0)))
 
     # C_vasatAssama - bool 'd_1'
-    if bools.get("d_1", False) and "NpM" in pts:
-        # Circle through Zenith, NpM, Nadir
-        if "Zenith" in pts and "Nadir" in pts:
-            c = circle_from_3pts(pts["Zenith"], pts["NpM"], pts["Nadir"])
-            emit_circle(out, c, D, "black", "black", lw_solid=0.5, lw_dashed=0.4)
+    if bools.get("d_1", False) and all(k in pts for k in ("NpM", "Zenith", "Nadir")):
+        draw_circle("C_vasatAssama",
+                    circle_from_3pts(pts["Zenith"], pts["NpM"], pts["Nadir"]))
 
-    # c_1 (apparent latitude circle): Circle[NpM, NPM', J] - bool 'w'
+    # c_1 (apparent latitude): Circle[NpM, NPM', J] - bool 'w'
     if bools.get("w", False) and all(k in pts for k in ("NpM", "NPM'", "J")):
-        c = circle_from_3pts(pts["NpM"], pts["NPM'"], pts["J"])
-        emit_circle(out, c, D, "red", "red", lw_solid=0.5, lw_dashed=0.4)
+        draw_circle("c_1", circle_from_3pts(pts["NpM"], pts["NPM'"], pts["J"]))
 
-    # C_ertefa5 (altitude=5° circle): Circle[Line_Ofogh, W'_1] - bool 'h_1'
-    # Line_Ofogh is the z-axis; circle is the parallel through W'_1
+    # C_ertefa5 (altitude=5°): Circle[Line_Ofogh, W'_1] - bool 'h_1'
     if bools.get("h_1", False) and "W'_{1}" in pts:
-        c = circle_axis_through((0.0, 0.0, 1.0), pts["W'_{1}"])
-        emit_circle(out, c, D, "black", "black", lw_solid=0.4, lw_dashed=0.35)
+        draw_circle("C_ertefa5",
+                    circle_axis_through((0.0, 0.0, 1.0), pts["W'_{1}"]))
 
-    # C_ertefa8 (altitude=8° circle): Circle[Line_Ofogh, W'] - bool 'g_1'
+    # C_ertefa8 (altitude=8°): Circle[Line_Ofogh, W'] - bool 'g_1'
     if bools.get("g_1", False) and "W'" in pts:
-        c = circle_axis_through((0.0, 0.0, 1.0), pts["W'"])
-        emit_circle(out, c, D, "black", "black", lw_solid=0.4, lw_dashed=0.35)
+        draw_circle("C_ertefa8",
+                    circle_axis_through((0.0, 0.0, 1.0), pts["W'"]))
 
-    # C_ErtefaGhamar = Circle[Ghamar, Zenith, Nadir] - bool 'a_1' ("ارتفاع")
-    # The moon's altitude great circle - passes through Zenith, Nadir,
-    # and the moon, indicating the moon's altitude above the horizon.
+    # C_ErtefaGhamar = Circle[Ghamar, Zenith, Nadir] - bool 'a_1'
     if bools.get("a_1", False) and all(k in pts for k in ("Ghamar", "Zenith", "Nadir")):
-        c = circle_from_3pts(pts["Ghamar"], pts["Zenith"], pts["Nadir"])
-        emit_circle(out, c, D, "black", "black", lw_solid=0.4, lw_dashed=0.35)
+        draw_circle("C_ErtefaGhamar",
+                    circle_from_3pts(pts["Ghamar"], pts["Zenith"], pts["Nadir"]))
 
-    # ------- Visible arc Arc_ArzGhamar (q=true) -------
-    if bools.get("q", True):
-        if "Ghamar" in pts and "MozeGhamar" in pts:
-            arc = arc_through_2pts((0.0, 0.0, 0.0), pts["Ghamar"], pts["MozeGhamar"])
-            if arc:
-                emit_circle(out, arc, D,
-                            "blue", "blue",
-                            lw_solid=1.4, lw_dashed=1.0,
-                            t_start=arc["t_start"], t_end=arc["t_end"],
-                            samples_full=24)
+    # Arc_ArzGhamar - bool 'q'
+    if bools.get("q", True) and "Ghamar" in pts and "MozeGhamar" in pts:
+        arc = arc_through_2pts((0.0, 0.0, 0.0), pts["Ghamar"], pts["MozeGhamar"])
+        if arc:
+            s = style("Arc_ArzGhamar")
+            emit_circle(out, arc, D,
+                        color=s["color"], lw=s["lw"],
+                        hidden_style=s["hidden_style"],
+                        fill_alpha=0.0,  # arcs aren't filled
+                        t_start=arc["t_start"], t_end=arc["t_end"],
+                        samples_full=24)
 
-    # ------- Segments -------
+    # ------- Segments (drawn from GGB-stored color/thickness/typeHidden) -------
     out.append(r"% --- segments ---")
     O = (0.0, 0.0, 0.0)
+    # j_1 = Segment[W, A]
     if "W" in pts:
-        emit_segment(out, pts["W"], O, D, "black", 0.5)
+        draw_segment("j_1", pts["W"], O)
+    # i_1 = Segment[MagharebGhamr, A] (cond 'e')
     if "MagharebGhamr" in pts and bools.get("e", True):
-        emit_segment(out, pts["MagharebGhamr"], O, D, "black", 0.5)
-    # Segment h: A -> Ghamar (bool 'r')
+        draw_segment("i_1", pts["MagharebGhamr"], O)
+    # h = Segment[A, Ghamar] (cond 'r')
     if bools.get("r", False) and "Ghamar" in pts:
-        emit_segment(out, O, pts["Ghamar"], D, "red", 0.7)
-    # Segment k: H -> J (bool 'r')
+        draw_segment("h", O, pts["Ghamar"])
+    # k = Segment[H, J] (cond 'r')
     if bools.get("r", False) and "H" in pts and "J" in pts:
-        emit_segment(out, pts["H"], pts["J"], D, "red", 0.7)
+        draw_segment("k", pts["H"], pts["J"])
     # k_1: Ghamar -> G,  l_1: K -> G
     # Compute G, K, M from intersections (independent of helper pts that may be hidden)
     if all(k in pts for k in ("Np", "Ghamar")):
@@ -657,26 +782,28 @@ def build_scene(ggb_path, theta_deg, phi_deg, show_axes_override=None):
             # Use the existing K, M from XML if present (they should match)
             K_pt = pts.get("K", K_pt)
             M_pt = pts.get("M", M_pt)
-            # Decide which of (K, M) is the one on -y side ("front" near W)
-            emit_segment(out, pts["Ghamar"], G, D, "red!70!black", 0.5)
-            emit_segment(out, K_pt, G, D, "red!70!black", 0.5)
+            # k_1 = Segment[Ghamar, G],  l_1 = Segment[K, G]
+            draw_segment("k_1", pts["Ghamar"], G)
+            draw_segment("l_1", K_pt, G)
             # Stash for points
             pts["G"] = G
             pts["K"] = K_pt
             pts["M"] = M_pt
 
-    # ------- Vectors -------
+    # ------- Vectors (style from GGB) -------
     out.append(r"% --- vectors ---")
+    def draw_vector(label, P1, P2):
+        s = style(label)
+        emit_vector(out, P1, P2, color=s["color"], lw=s["lw"])
     # u_1: B -> 1.2 B  (z-axis upward arrow)
     if "B" in pts:
-        B = pts["B"]
-        emit_vector(out, B, scale(B, 1.2), "black", 1.0)
+        draw_vector("u_1", pts["B"], scale(pts["B"], 1.2))
     # v_1: Np -> 1.2 Np
     if "Np" in pts:
-        emit_vector(out, pts["Np"], scale(pts["Np"], 1.2), "blue", 1.0)
+        draw_vector("v_1", pts["Np"], scale(pts["Np"], 1.2))
     # w_1: Sp -> 1.2 Sp
     if "Sp" in pts:
-        emit_vector(out, pts["Sp"], scale(pts["Sp"], 1.2), "blue", 1.0)
+        draw_vector("w_1", pts["Sp"], scale(pts["Sp"], 1.2))
 
     # ------- Axis lines (only if GGB shows them) -------
     if show_axes:
@@ -696,29 +823,22 @@ def build_scene(ggb_path, theta_deg, phi_deg, show_axes_override=None):
             emit_point(out, P, "yellow!70!orange", "1.2", D)
 
     # ------- Inner concentric spheres b, d (bool 'r' = "موضع مرئی") -------
-    # b uses point H, d uses point I (both on z-axis); radius = |point|.
-    # Drawn as flat shaded disks in screen coords on the back pgflayer.
-    # Colors and alphas are taken from the .ggb so they match GGB:
-    #     d: rgb (191,255,0) = lime, alpha 0.20  -> very transparent
-    #     b: rgb (0,153,255), alpha 0.75         -> mostly opaque blue
-    # Emitting them HERE (after all back arcs have been added to the back
-    # layer in source order) means within the back layer they paint AFTER
-    # the dashed back arcs, so they correctly obscure those arcs.
+    # Colors and alphas are taken from the .ggb's stored object color so
+    # editing them in GeoGebra propagates here. They go on the `midback`
+    # pgflayer: above outer-sphere shading and back-arcs, below front
+    # arcs and points.
     if bools.get("r", False):
-        if "I" in pts:
-            r_d = norm(pts["I"])
-            out.append(r"\begin{pgfonlayer}{back}")
+        for label, pt_label in (("d", "I"), ("b", "H")):  # outermost first
+            if pt_label not in pts or label not in styles:
+                continue
+            radius = norm(pts[pt_label])
+            sty = styles[label]
+            col = rgb_color(sty["rgb"])
+            alpha = min(0.85, sty["alpha"])
+            out.append(r"\begin{pgfonlayer}{midback}")
             out.append(r"\begin{scope}[tdplot_screen_coords]")
-            out.append(rf"\shade[ball color={{rgb,255:red,191;green,255;blue,0}},"
-                       rf"opacity=0.22] (0,0) circle ({fmt(r_d)});")
-            out.append(r"\end{scope}")
-            out.append(r"\end{pgfonlayer}")
-        if "H" in pts:
-            r_b = norm(pts["H"])
-            out.append(r"\begin{pgfonlayer}{back}")
-            out.append(r"\begin{scope}[tdplot_screen_coords]")
-            out.append(rf"\shade[ball color={{rgb,255:red,0;green,153;blue,255}},"
-                       rf"opacity=0.75] (0,0) circle ({fmt(r_b)});")
+            out.append(rf"\shade[ball color={col},opacity={alpha:.3f}] "
+                       rf"(0,0) circle ({fmt(radius)});")
             out.append(r"\end{scope}")
             out.append(r"\end{pgfonlayer}")
         out.append("")
@@ -775,8 +895,15 @@ TEX_TEMPLATE = r"""% AUTO-GENERATED by ggb2pdf.py - regenerate with: python ggb2
 \usepackage{tikz-3dplot}
 \usetikzlibrary{calc,arrows.meta,decorations.markings,backgrounds,positioning}
 
-\pgfdeclarelayer{back}\pgfdeclarelayer{front}
-\pgfsetlayers{back,main,front}
+% Layer order, back to front:
+%   back     : outer-sphere ball shading + dashed/hidden back-arcs of circles
+%   midback  : filled conic disks (alpha>0) + inner spheres (b, d)
+%   main     : front-arcs, segments, vectors
+%   front    : points + labels
+\pgfdeclarelayer{back}
+\pgfdeclarelayer{midback}
+\pgfdeclarelayer{front}
+\pgfsetlayers{back,midback,main,front}
 
 \tdplotsetmaincoords{__THETA__}{__PHI__}
 
