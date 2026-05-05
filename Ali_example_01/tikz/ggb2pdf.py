@@ -699,6 +699,8 @@ def main(argv):
         theta_def, phi_def = 25.0, -60.0
     theta = args.theta if args.theta is not None else theta_def
     phi = args.phi if args.phi is not None else phi_def
+    theta = theta + 0
+    phi = -phi + 0 
     if args.no_axes:
         show_axes_override = False
     elif args.axes:
