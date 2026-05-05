@@ -75,6 +75,12 @@ that GeoGebra doesn't pre‑compute as named points.
   coords with `z` as the homogenizer.
 - `extract_booleans(root)` — reads the checkbox elements (`e`, `q`,
   `r`, …) so the script can honor them.
+- `extract_line_dirs(root)` — reads the unit direction vector of every
+  `<line3d>` and `<ray3d>` element, returned as `{label: (vx, vy, vz)}`.
+  This is **load-bearing for any `Rotate[obj, angle, MyLine]`
+  construction**: the rotation handedness depends on which way the line
+  points, and the antipodal point on the sphere is *not* a safe
+  substitute (see §7.5).
 - `extract_camera(root)` — reads `xAngle`, `zAngle` and whether axes are
   shown.
 - `extract_sphere_radius(pts)` — reads `R` from the actual distance
@@ -209,14 +215,16 @@ a GGB object to the lines in `ggb2pdf.py` that draw it.
 | `C_nesf` | circle (red) | `Circle[S, B, N]` (the meridian) | `circle_from_3pts(pts["S"], pts["B"], pts["N"])` |
 | `C_yomiGhamar` | small circle | `Circle[Line_moaddel, Ghamar]` | `circle_axis_through(pts["Np"], pts["Ghamar"])` |
 | `C_ofoghTaksiryGhamar` | circle (red) | `Circle[MagharebGhamr, Ghamar, −Ghamar]` | `circle_from_3pts(MagharebGhamr, Ghamar, −Ghamar)`. Conditional on bool **`e`**. |
-| `C_BodeMoaddal9` | circle | `Rotate[C_ofogh, −9°, Line_moaddel]` | rotate `E, S, W` around `Np` by −9°, then `circle_from_3pts`. Conditional on **`l`**. |
-| `C_boadSeva9` | circle | `Circle[NpM, Ghareb′, NPM']` | rotate `Ghareb` around `NpM` by −9°. Conditional on **`j`**. |
+| `C_BodeMoaddal9` | circle | `Rotate[C_ofogh, −9°, Line_moaddel]` | rotate `E, S, W` around **`line_dirs["Line_moaddel"]`** by −9°, then `circle_from_3pts`. **Must use the line's stored direction, not `pts["Np"]`** — they're antiparallel and rotating around `Np` flips the handedness (see §7.5). Conditional on **`l`**. |
+| `C_boadSeva9` | circle | `Circle[NpM, Ghareb′, NPM']` | `circle_from_3pts(NpM, pts["Ghareb'"], NPM')` — uses GGB's stored `Ghareb'` directly rather than recomputing the rotation. Conditional on **`j`**. |
 | `C_ArzGhamar` | circle | `Circle[NpM, NPM', MozeGhamar]` | `circle_from_3pts(...)`. Conditional on **`m`**. |
-| `C_Arzghamr*` | circle pair | mirrored ±6° rotations of Hamal | rotate `Hamal` by ±6° around `NpM`. Conditional on **`o`**. |
+| `C_Arzghamrmanfi6` | small circle | `Circle[Line_mentaghe, Hamal']` (+6° lunar-latitude parallel around the ecliptic) | `circle_axis_through(pts["NpM"], pts["Hamal'"])`. Uses GGB's stored `Hamal'`. Conditional on **`o`**. |
+| `C_Arzghamr6` | small circle | `Mirror[C_Arzghamrmanfi6, A]` (−6° lunar-latitude parallel) | `circle_axis_through(pts["NpM"], −pts["Hamal'"])`. Conditional on **`o`**. |
 | `C_vasatAssama` | circle | `Circle[Zenith, NpM, Nadir]` | `circle_from_3pts(...)`. Conditional on **`d_1`**. |
+| `C_ErtefaGhamar` | great circle | `Circle[Ghamar, Zenith, Nadir]` (موت altitude — passes through zenith, nadir, and the moon) | `circle_from_3pts(Ghamar, Zenith, Nadir)`. Conditional on **`a_1`** ("ارتفاع"). Note: GGB stores this element with `show object="false"`, but the `a_1` checkbox is the canonical visibility gate, so we honor that. |
 | `c_1` | circle | `Circle[NpM, NPM', J]` (apparent latitude) | `circle_from_3pts(NpM, NPM', J)`. Conditional on **`w`**. |
-| `C_ertefa5` | small circle | `Circle[zAxis, W'_1]` (altitude 5°) | `circle_axis_through((0,0,1), pts["W'_{1}"])`. Conditional on **`h_1`**. |
-| `C_ertefa8` | small circle | `Circle[zAxis, W']` (altitude 8°) | `circle_axis_through((0,0,1), pts["W'"])`. Conditional on **`g_1`**. |
+| `C_ertefa5` | small circle | `Circle[Line_Ofogh, W'_1]` (altitude 5°) | `circle_axis_through((0,0,1), pts["W'_{1}"])`. Conditional on **`h_1`** ("ارتفاع5"). |
+| `C_ertefa8` | small circle | `Circle[Line_Ofogh, W']` (altitude 8°) | `circle_axis_through((0,0,1), pts["W'"])`. Conditional on **`g_1`** ("ارتفاع8"). |
 | `b` | inner sphere | `Sphere[A, H]` (radius `\|H\|`) | flat shaded disk in screen coords, back layer. Conditional on **`r`**. |
 | `d` | inner sphere | `Sphere[A, I]` (radius `\|I\|`) | flat shaded disk in screen coords, back layer. Conditional on **`r`**. |
 | `h` | segment | `Segment[A, Ghamar]` (red) | `emit_segment(O, Ghamar, …)`. Conditional on **`r`**. |

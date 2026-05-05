@@ -95,6 +95,34 @@ def extract_booleans(root):
     return out
 
 
+def extract_line_dirs(root):
+    """Return label -> 3-D unit direction for every <line3d>/<ray3d>.
+
+    Important: GeoGebra stores a line's direction with a specific sign.
+    Although the line is geometrically bidirectional, the right-hand-rule
+    rotation around the line uses the stored direction.  So when a
+    construction does `Rotate[obj, angle, MyLine]` we MUST use this exact
+    stored direction to get the same orientation GeoGebra computed.
+    """
+    out = {}
+    for el in root.iter("element"):
+        if el.get("type") not in ("line3d", "ray3d"):
+            continue
+        c = el.find("coords")
+        if c is None:
+            continue
+        try:
+            vx = float(c.get("vx", "0"))
+            vy = float(c.get("vy", "0"))
+            vz = float(c.get("vz", "0"))
+        except (TypeError, ValueError):
+            continue
+        n = math.sqrt(vx * vx + vy * vy + vz * vz)
+        if n > 1e-12:
+            out[el.get("label")] = (vx / n, vy / n, vz / n)
+    return out
+
+
 def extract_camera(root):
     cs = root.find(".//euclidianView3D/coordSystem")
     if cs is None:
@@ -418,6 +446,7 @@ def build_scene(ggb_path, theta_deg, phi_deg, show_axes_override=None):
     root = parse_ggb_xml(ggb_path)
     pts = extract_points(root)
     bools = extract_booleans(root)
+    line_dirs = extract_line_dirs(root)
     cam_x, cam_z, cam_axes = extract_camera(root)
 
     R = extract_sphere_radius(pts)
@@ -500,19 +529,25 @@ def build_scene(ggb_path, theta_deg, phi_deg, show_axes_override=None):
                         "red", "red",
                         lw_solid=0.9, lw_dashed=0.6, opacity_back=0.45)
 
-    # C_BodeMoaddal9 (-9° rotation of C_ofogh around Line_moaddel): cond 'l'
-    if bools.get("l", False) and "Np" in pts and "E" in pts:
-        # Rotate C_ofogh's three defining points around Line_moaddel (= axis Np) by -9°
-        E2 = rotate_axis(pts["E"], pts["Np"], -9.0)
-        S2 = rotate_axis(pts["S"], pts["Np"], -9.0)
-        W2 = rotate_axis(pts["W"], pts["Np"], -9.0)
+    # C_BodeMoaddal9 = Rotate[C_ofogh, -9°, Line_moaddel] - bool 'l'
+    # We MUST rotate around Line_moaddel's stored direction (not pts["Np"]):
+    # GGB stores `Line_moaddel` direction as approximately (cos(Arz), 0, -sin(Arz)),
+    # while Np is the *antipodal* intersection of that line with the sphere.
+    # Using pts["Np"] flips the rotation handedness and rotates the horizon by
+    # +9° instead of -9°, which lands the circle on the wrong side.
+    if bools.get("l", False) and "Line_moaddel" in line_dirs and "E" in pts:
+        ax = line_dirs["Line_moaddel"]
+        E2 = rotate_axis(pts["E"], ax, -9.0)
+        S2 = rotate_axis(pts["S"], ax, -9.0)
+        W2 = rotate_axis(pts["W"], ax, -9.0)
         c = circle_from_3pts(E2, S2, W2)
         emit_circle(out, c, D, "red", "red", lw_solid=0.4, lw_dashed=0.35)
 
-    # C_boadSeva9 - bool 'j'
-    if bools.get("j", False) and all(k in pts for k in ("NpM", "NPM'", "Ghareb")):
-        Ghareb_p = rotate_axis(pts["Ghareb"], pts["NpM"], -9.0)
-        c = circle_from_3pts(pts["NpM"], Ghareb_p, pts["NPM'"])
+    # C_boadSeva9: Circle[NpM, Ghareb', NPM']  (great circle, bool 'j')
+    # Use the Ghareb' point that GGB already stored, rather than
+    # recomputing the rotation, so the geometry exactly matches GGB.
+    if bools.get("j", False) and all(k in pts for k in ("NpM", "NPM'", "Ghareb'")):
+        c = circle_from_3pts(pts["NpM"], pts["Ghareb'"], pts["NPM'"])
         emit_circle(out, c, D, "blue", "blue", lw_solid=0.4, lw_dashed=0.35)
 
     # C_ArzGhamar - bool 'm'
@@ -520,14 +555,20 @@ def build_scene(ggb_path, theta_deg, phi_deg, show_axes_override=None):
         c = circle_from_3pts(pts["NpM"], pts["NPM'"], pts["MozeGhamar"])
         emit_circle(out, c, D, "black", "black", lw_solid=0.4, lw_dashed=0.35)
 
-    # C_Arzghamrmanfi6 / C_Arzghamr6 - bool 'o'
-    if bools.get("o", False) and all(k in pts for k in ("NpM", "NPM'", "Hamal")):
-        Hp = rotate_axis(pts["Hamal"], normalize(pts["NpM"]), 6.0)
-        c = circle_from_3pts(pts["NpM"], pts["NPM'"], Hp)
-        emit_circle(out, c, D, "violet", "violet", lw_solid=0.3, lw_dashed=0.3)
-        Hm = rotate_axis(pts["Hamal"], normalize(pts["NpM"]), -6.0)
-        c2 = circle_from_3pts(pts["NpM"], pts["NPM'"], Hm)
-        emit_circle(out, c2, D, "violet", "violet", lw_solid=0.3, lw_dashed=0.3)
+    # C_Arzghamrmanfi6 = Circle[Line_mentaghe, Hamal'] - bool 'o'
+    # This is a SMALL CIRCLE around the NpM-axis (Line_mentaghe) passing
+    # through Hamal' (= Hamal rotated 6° around the axis perpendicular to
+    # the great circle NpM-Hamal-NPM').  It represents the +6° lunar-
+    # latitude parallel relative to the ecliptic.  Use Hamal' from XML.
+    if bools.get("o", False) and "NpM" in pts and "Hamal'" in pts:
+        c = circle_axis_through(pts["NpM"], pts["Hamal'"])
+        emit_circle(out, c, D, "violet", "violet",
+                    lw_solid=0.4, lw_dashed=0.35)
+        # C_Arzghamr6 = Mirror[C_Arzghamrmanfi6, A]: same axis, opposite
+        # side of origin -> circle around NpM-axis through -Hamal'.
+        c2 = circle_axis_through(pts["NpM"], scale(pts["Hamal'"], -1.0))
+        emit_circle(out, c2, D, "violet", "violet",
+                    lw_solid=0.4, lw_dashed=0.35)
 
     # C_vasatAssama - bool 'd_1'
     if bools.get("d_1", False) and "NpM" in pts:
@@ -550,6 +591,13 @@ def build_scene(ggb_path, theta_deg, phi_deg, show_axes_override=None):
     # C_ertefa8 (altitude=8° circle): Circle[Line_Ofogh, W'] - bool 'g_1'
     if bools.get("g_1", False) and "W'" in pts:
         c = circle_axis_through((0.0, 0.0, 1.0), pts["W'"])
+        emit_circle(out, c, D, "black", "black", lw_solid=0.4, lw_dashed=0.35)
+
+    # C_ErtefaGhamar = Circle[Ghamar, Zenith, Nadir] - bool 'a_1' ("ارتفاع")
+    # The moon's altitude great circle - passes through Zenith, Nadir,
+    # and the moon, indicating the moon's altitude above the horizon.
+    if bools.get("a_1", False) and all(k in pts for k in ("Ghamar", "Zenith", "Nadir")):
+        c = circle_from_3pts(pts["Ghamar"], pts["Zenith"], pts["Nadir"])
         emit_circle(out, c, D, "black", "black", lw_solid=0.4, lw_dashed=0.35)
 
     # ------- Visible arc Arc_ArzGhamar (q=true) -------
@@ -650,6 +698,9 @@ def build_scene(ggb_path, theta_deg, phi_deg, show_axes_override=None):
     # ------- Inner concentric spheres b, d (bool 'r' = "موضع مرئی") -------
     # b uses point H, d uses point I (both on z-axis); radius = |point|.
     # Drawn as flat shaded disks in screen coords on the back pgflayer.
+    # Colors and alphas are taken from the .ggb so they match GGB:
+    #     d: rgb (191,255,0) = lime, alpha 0.20  -> very transparent
+    #     b: rgb (0,153,255), alpha 0.75         -> mostly opaque blue
     # Emitting them HERE (after all back arcs have been added to the back
     # layer in source order) means within the back layer they paint AFTER
     # the dashed back arcs, so they correctly obscure those arcs.
@@ -658,14 +709,16 @@ def build_scene(ggb_path, theta_deg, phi_deg, show_axes_override=None):
             r_d = norm(pts["I"])
             out.append(r"\begin{pgfonlayer}{back}")
             out.append(r"\begin{scope}[tdplot_screen_coords]")
-            out.append(rf"\shade[ball color=yellow!40!green,opacity=0.55] (0,0) circle ({fmt(r_d)});")
+            out.append(rf"\shade[ball color={{rgb,255:red,191;green,255;blue,0}},"
+                       rf"opacity=0.22] (0,0) circle ({fmt(r_d)});")
             out.append(r"\end{scope}")
             out.append(r"\end{pgfonlayer}")
         if "H" in pts:
             r_b = norm(pts["H"])
             out.append(r"\begin{pgfonlayer}{back}")
             out.append(r"\begin{scope}[tdplot_screen_coords]")
-            out.append(rf"\shade[ball color=cyan!50!blue,opacity=0.90] (0,0) circle ({fmt(r_b)});")
+            out.append(rf"\shade[ball color={{rgb,255:red,0;green,153;blue,255}},"
+                       rf"opacity=0.75] (0,0) circle ({fmt(r_b)});")
             out.append(r"\end{scope}")
             out.append(r"\end{pgfonlayer}")
         out.append("")
