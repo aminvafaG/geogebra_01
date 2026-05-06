@@ -2,7 +2,22 @@
   "permissions": {
     "allow": [
       "Bash(powershell -Command \"Expand-Archive -Path Final_Helal_1404_BSe_BMo.ggb -DestinationPath ggb_extract -Force; Get-ChildItem -Recurse ggb_extract | Select-Object Name\")",
-      "Bash(powershell -Command \"Copy-Item Final_Helal_1404_BSe_BMo.ggb ggb_extract.zip -Force; Expand-Archive -Path ggb_extract.zip -DestinationPath ggb_extract -Force; Get-ChildItem ggb_extract\")"
+      "Bash(powershell -Command \"Copy-Item Final_Helal_1404_BSe_BMo.ggb ggb_extract.zip -Force; Expand-Archive -Path ggb_extract.zip -DestinationPath ggb_extract -Force; Get-ChildItem ggb_extract\")",
+      "Bash(python -c ' *)",
+      "Bash(PYTHONIOENCODING=utf-8 python sweep.py ../Final_Helal_1404_BSe_BMo.ggb Arz 36:1:36 -o ../sweep_test --no-pdf)",
+      "Bash(PYTHONIOENCODING=utf-8 python sweep.py ../Final_Helal_1404_BSe_BMo.ggb Arz 0:30:90 -o ../sweep_Arz)",
+      "Bash(cd \"/c/Users/aminv/Documents/geogebra_01/Ali_example_01/sweep_Arz\" && ls -la)",
+      "Read(//c/c/Users/aminv/Documents/geogebra_01/Ali_example_01/**)",
+      "Bash(cd \"/c/Users/aminv/Documents/geogebra_01/Ali_example_01\" && rm -rf sweep_test inspect_chain.py)",
+      "Bash(where pdftoppm *)",
+      "Bash(where gs *)",
+      "Bash(where magick *)",
+      "Bash(python -c \"import pdf2image; print\\('pdf2image ok'\\)\")",
+      "Bash(python -c \"import PIL; print\\('Pillow ok'\\)\")",
+      "Bash(pdftoppm --help)"
+    ],
+    "additionalDirectories": [
+      "c:\\c\\Users\\aminv\\Documents\\geogebra_01\\Ali_example_01"
     ]
   }
 }
