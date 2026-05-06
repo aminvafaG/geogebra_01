@@ -16,7 +16,8 @@ For each value v in the matlab-style range, the script:
      points/lines are recomputed in Python from the <command> tree).
   2. Writes a new .ggb (zip) with the updated cached coordinates.
   3. Extracts the modified geogebra.xml alongside it.
-  4. Invokes ggb2pdf.py to render a vector PDF.
+  4. Invokes ggb2pdf.py to render a vector PDF and saves the generated
+     TikZ .tex source next to it.
 
 Implementation notes
 --------------------
@@ -1147,7 +1148,9 @@ def main(argv):
     ap.add_argument("--unit", choices=("deg", "rad"), default="deg",
                     help="unit of the range values (default: deg, since GGB sliders are angles)")
     ap.add_argument("--no-pdf", action="store_true",
-                    help="emit .ggb + .xml only; don't run ggb2pdf.py")
+                    help="skip xelatex; .tex is still emitted unless --no-tex")
+    ap.add_argument("--no-tex", action="store_true",
+                    help="skip saving the generated TikZ .tex source")
     ap.add_argument("--no-jpg", action="store_true",
                     help="skip JPEG generation even when a PDF is produced")
     ap.add_argument("--dpi", type=int, default=150,
@@ -1176,8 +1179,10 @@ def main(argv):
     print(f"Sweeping {args.slider} over {len(values)} values: {values}")
     print(f"Output dir: {out_dir}")
 
-    # Path to ggb2pdf.py (sibling)
+    # Path to ggb2pdf.py (sibling). It always writes its TikZ source to
+    # `helal.tex` next to itself; we copy that out per iteration.
     ggb2pdf = Path(__file__).resolve().parent / "ggb2pdf.py"
+    helal_tex = ggb2pdf.parent / "helal.tex"
 
     fmt_v = "{:+07.2f}" if any(v < 0 for v in values) else "{:06.2f}"
     produced_pdfs: list[Path] = []
@@ -1199,21 +1204,39 @@ def main(argv):
         xml_out.write_bytes(new_xml)
         print(f"  {args.slider}={v:>7.3f} {args.unit} -> {ggb_out.name}", end="")
 
-        if not args.no_pdf:
+        wants_pdf = not args.no_pdf
+        wants_tex = not args.no_tex
+
+        if wants_pdf or wants_tex:
             pdf_out = out_dir / f"{stem}.pdf"
+            tex_out = out_dir / f"{stem}.tex"
             cmd = [sys.executable, str(ggb2pdf), str(ggb_out), "-o", str(pdf_out)]
+            if not wants_pdf:
+                cmd.append("--tex-only")
             res = subprocess.run(cmd, capture_output=True, text=True)
+
+            # ggb2pdf.py writes helal.tex BEFORE invoking xelatex, so it
+            # exists even when xelatex fails. Grab it first so failed
+            # cases stay inspectable.
+            if wants_tex and helal_tex.exists():
+                shutil.copyfile(helal_tex, tex_out)
+
             if res.returncode != 0:
-                print(f"   [PDF FAILED]")
+                what = "PDF" if wants_pdf else "TEX"
+                print(f"   [{what} FAILED]")
                 print(res.stdout[-1500:] or "")
                 print(res.stderr[-1500:] or "", file=sys.stderr)
                 continue
-            produced_pdfs.append(pdf_out)
-            print(f", {pdf_out.name}", end="")
-            if not args.no_jpg:
-                jpg_out = out_dir / f"{stem}.jpg"
-                if pdf_to_jpg(pdf_out, jpg_out, args.dpi):
-                    print(f", {jpg_out.name}", end="")
+
+            if wants_tex:
+                print(f", {tex_out.name}", end="")
+            if wants_pdf:
+                produced_pdfs.append(pdf_out)
+                print(f", {pdf_out.name}", end="")
+                if not args.no_jpg:
+                    jpg_out = out_dir / f"{stem}.jpg"
+                    if pdf_to_jpg(pdf_out, jpg_out, args.dpi):
+                        print(f", {jpg_out.name}", end="")
 
         print()
 
