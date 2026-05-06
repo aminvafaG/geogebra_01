@@ -34,133 +34,127 @@
 
 % --- 3D coordinate aliases (so labels can use \node at (Foo)) ---
 \coordinate (B) at (0.00000,0.00000,5.36048);
-\coordinate (Bp) at (0.00009,0.00000,5.36048);
+\coordinate (Bp) at (-0.93084,0.00000,5.27904);
 \coordinate (A) at (-0.00000,-0.00000,0.00000);
 \coordinate (N) at (-5.36048,0.00000,0.00000);
 \coordinate (S) at (5.36048,0.00000,0.00000);
 \coordinate (W) at (0.00000,-5.36048,0.00000);
 \coordinate (E) at (0.00000,5.36048,0.00000);
-\coordinate (Np) at (-5.36048,-0.00000,0.00009);
-\coordinate (Sp) at (5.36048,0.00000,-0.00009);
-\coordinate (Npp) at (-4.91585,0.00000,2.13757);
-\coordinate (NpM) at (-4.91585,0.37117,2.10510);
-\coordinate (Ghareb) at (-0.40359,-5.34527,-0.00000);
-\coordinate (Mizan) at (0.00002,-5.27904,0.93084);
-\coordinate (Hamal) at (-0.00002,5.27904,-0.93084);
-\coordinate (Shams) at (-1.06877,-4.99860,-1.61445);
-\coordinate (NPMp) at (4.91585,-0.37117,-2.10510);
-\coordinate (MozeGhamar) at (0.24630,-5.14553,1.48243);
-\coordinate (MozeGhamarp) at (-2.12333,-1.45619,-4.70167);
-\coordinate (Ghamar) at (0.69933,-5.15782,1.28164);
-\coordinate (Hamalp) at (0.51383,5.21133,-1.14578);
+\coordinate (Np) at (-5.27904,-0.00000,-0.93084);
+\coordinate (Sp) at (5.27904,0.00000,0.93084);
+\coordinate (Npp) at (-5.21237,0.00000,1.25138);
+\coordinate (NpM) at (-4.47567,0.37117,-2.92667);
+\coordinate (Ghareb) at (-0.44303,-5.34214,-0.00000);
+\coordinate (Mizan) at (-0.16164,5.27904,0.91670);
+\coordinate (Hamal) at (0.16164,-5.27904,-0.91670);
+\coordinate (Shams) at (-1.61282,4.14497,2.99212);
+\coordinate (NPMp) at (4.47567,-0.37117,2.92667);
+\coordinate (MozeGhamar) at (-1.29958,-5.02216,1.35048);
+\coordinate (MozeGhamarp) at (2.64844,-1.83710,-4.28317);
+\coordinate (Ghamar) at (-0.88060,-5.03497,1.61504);
+\coordinate (Hamalp) at (0.62859,-5.28892,-0.60575);
 \coordinate (Nadir) at (-0.00000,0.00000,-5.36048);
 \coordinate (Zenith) at (0.00000,0.00000,5.36048);
-\coordinate (C) at (0.69931,-5.31467,0.00000);
-\coordinate (D) at (0.00002,-5.20228,1.29270);
-\coordinate (F) at (0.00000,-5.36048,0.00001);
-\coordinate (Ghamarp) at (-0.69933,5.15782,-1.28164);
-\coordinate (MagharebGhamr) at (0.00002,-5.20228,1.29269);
-\coordinate (Shamsp) at (1.06877,4.99860,1.61445);
-\coordinate (GhamarMoaddal) at (0.16070,-5.19994,1.29211);
-\coordinate (GhamarMoaddalp) at (-0.16070,5.19994,-1.29211);
-\coordinate (Gharebp) at (-0.07025,-5.30425,0.77120);
+\coordinate (C) at (-0.59583,-5.32726,0.00000);
+\coordinate (D) at (-0.30457,-5.06541,1.72732);
+\coordinate (F) at (-0.01807,-5.35947,0.10251);
+\coordinate (Ghamarp) at (0.88060,5.03497,-1.61504);
+\coordinate (MagharebGhamr) at (0.28743,-5.09851,-1.63012);
+\coordinate (Shamsp) at (1.61282,-4.14497,-2.99212);
+\coordinate (GhamarMoaddal) at (-0.15836,-5.34044,-0.43512);
+\coordinate (GhamarMoaddalp) at (0.15836,5.34044,0.43512);
+\coordinate (Gharebp) at (-0.89384,-5.23853,0.70255);
 \coordinate (Wp) at (0.00000,-5.30831,0.74603);
 \coordinate (WpX{1}) at (0.00000,-5.34008,0.46720);
 \coordinate (H) at (0.00000,0.00000,0.66019);
 \coordinate (I) at (0.00000,0.00000,3.76253);
-\coordinate (L) at (0.49086,-3.62028,0.89959);
-\coordinate (J) at (0.70744,-5.21764,1.00522);
+\coordinate (L) at (-0.61810,-3.53406,1.13360);
+\coordinate (J) at (-0.89398,-5.11144,1.34491);
 \coordinate (BB) at (0.00000,0.00000,6.43258);
-\coordinate (Npv) at (-6.43258,-0.00000,0.00011);
-\coordinate (G) at (0.69931,0.00000,-0.00001);
-\coordinate (K) at (0.69931,-5.31467,0.00000);
-\coordinate (M) at (0.69931,5.31467,-0.00000);
+\coordinate (Npv) at (-6.33485,-0.00000,-1.11701);
+\coordinate (G) at (-0.57786,-0.00000,-0.10189);
+\coordinate (K) at (-0.59583,-5.32726,0.00000);
+\coordinate (M) at (-0.59583,5.32726,-0.00000);
 
 % --- 3D circles ---
 \begin{pgfonlayer}{midback}
 \fill[color={rgb,255:red,0;green,102;blue,51},opacity=0.850] plot[domain=0.0000:360.0000,samples=80,smooth,variable=\t] ({0.00000+5.36048*(-0.00000*cos(\t)+1.00000*sin(\t))},{0.00000+5.36048*(1.00000*cos(\t)+0.00000*sin(\t))},{0.00000+5.36048*(0.00000*cos(\t)+0.00000*sin(\t))}) -- cycle;
 \end{pgfonlayer}
 \draw[color={rgb,255:red,0;green,102;blue,51},line width=1.46pt] plot[domain=115.0000:295.0000,samples=40,smooth,variable=\t] ({0.00000+5.36048*(-0.00000*cos(\t)+1.00000*sin(\t))},{0.00000+5.36048*(1.00000*cos(\t)+0.00000*sin(\t))},{0.00000+5.36048*(0.00000*cos(\t)+0.00000*sin(\t))});
-\draw[color={rgb,255:red,0;green,0;blue,255},line width=1.28pt] plot[domain=0.0000:165.7092,samples=36,smooth,variable=\t] ({-0.00000+5.36048*(0.00002*cos(\t)+0.00000*sin(\t))},{0.00000+5.36048*(0.00000*cos(\t)+-1.00000*sin(\t))},{-0.00000+5.36048*(1.00000*cos(\t)+0.00000*sin(\t))});
-\draw[color={rgb,255:red,0;green,0;blue,255},line width=1.28pt] plot[domain=345.7092:360.0000,samples=8,smooth,variable=\t] ({-0.00000+5.36048*(0.00002*cos(\t)+0.00000*sin(\t))},{0.00000+5.36048*(0.00000*cos(\t)+-1.00000*sin(\t))},{-0.00000+5.36048*(1.00000*cos(\t)+0.00000*sin(\t))});
-\draw[color={rgb,255:red,128;green,0;blue,128},line width=1.28pt] plot[domain=94.4996:274.4996,samples=40,smooth,variable=\t] ({0.00000+5.36048*(0.07529*cos(\t)+-0.39159*sin(\t))},{0.00000+5.36048*(0.99716*cos(\t)+0.02957*sin(\t))},{0.00000+5.36048*(-0.00000*cos(\t)+-0.91966*sin(\t))});
+\draw[color={rgb,255:red,0;green,0;blue,255},line width=1.28pt] plot[domain=0.0000:161.6422,samples=35,smooth,variable=\t] ({0.00000+5.36048*(-0.17365*cos(\t)+0.00000*sin(\t))},{0.00000+5.36048*(0.00000*cos(\t)+-1.00000*sin(\t))},{-0.00000+5.36048*(0.98481*cos(\t)+0.00000*sin(\t))});
+\draw[color={rgb,255:red,0;green,0;blue,255},line width=1.28pt] plot[domain=341.6422:360.0000,samples=8,smooth,variable=\t] ({0.00000+5.36048*(-0.17365*cos(\t)+0.00000*sin(\t))},{0.00000+5.36048*(0.00000*cos(\t)+-1.00000*sin(\t))},{-0.00000+5.36048*(0.98481*cos(\t)+0.00000*sin(\t))});
+\draw[color={rgb,255:red,128;green,0;blue,128},line width=1.28pt] plot[domain=112.1806:292.1806,samples=40,smooth,variable=\t] ({0.00000+5.36048*(0.08265*cos(\t)+0.54410*sin(\t))},{0.00000+5.36048*(0.99658*cos(\t)+-0.04512*sin(\t))},{0.00000+5.36048*(-0.00000*cos(\t)+-0.83780*sin(\t))});
 \draw[color={rgb,255:red,255;green,0;blue,0},line width=1.0999999999999999pt] plot[domain=61.3531:241.3531,samples=40,smooth,variable=\t] ({0.00000+5.36048*(1.00000*cos(\t)+0.00000*sin(\t))},{0.00000+5.36048*(0.00000*cos(\t)+0.00000*sin(\t))},{0.00000+5.36048*(-0.00000*cos(\t)+1.00000*sin(\t))});
-\draw[color={rgb,255:red,128;green,0;blue,0},line width=0.56pt] plot[domain=0.0000:86.9274,samples=19,smooth,variable=\t] ({0.69931+5.31467*(0.00000*cos(\t)+0.00002*sin(\t))},{0.00000+5.31467*(-0.97049*cos(\t)+0.24115*sin(\t))},{-0.00001+5.31467*(0.24115*cos(\t)+0.97049*sin(\t))});
-\draw[color={rgb,255:red,128;green,0;blue,0},line width=0.56pt] plot[domain=273.7449:360.0000,samples=19,smooth,variable=\t] ({0.69931+5.31467*(0.00000*cos(\t)+0.00002*sin(\t))},{0.00000+5.31467*(-0.97049*cos(\t)+0.24115*sin(\t))},{-0.00001+5.31467*(0.24115*cos(\t)+0.97049*sin(\t))});
-\draw[color={rgb,255:red,255;green,0;blue,0},line width=0.9199999999999999pt] plot[domain=0.0000:65.6823,samples=14,smooth,variable=\t] ({-0.00000+5.36048*(0.00000*cos(\t)+1.00000*sin(\t))},{-0.00000+5.36048*(-0.97049*cos(\t)+0.00000*sin(\t))},{0.00000+5.36048*(0.24115*cos(\t)+-0.00000*sin(\t))});
-\draw[color={rgb,255:red,255;green,0;blue,0},line width=0.9199999999999999pt] plot[domain=245.6823:360.0000,samples=25,smooth,variable=\t] ({-0.00000+5.36048*(0.00000*cos(\t)+1.00000*sin(\t))},{-0.00000+5.36048*(-0.97049*cos(\t)+0.00000*sin(\t))},{0.00000+5.36048*(0.24115*cos(\t)+-0.00000*sin(\t))});
-\draw[color={rgb,255:red,255;green,0;blue,0},line width=0.56pt] plot[domain=114.4092:294.4092,samples=40,smooth,variable=\t] ({-0.00000+5.36048*(-0.00000*cos(\t)+1.00000*sin(\t))},{0.00000+5.36048*(0.98769*cos(\t)+0.00000*sin(\t))},{-0.00000+5.36048*(-0.15643*cos(\t)+-0.00000*sin(\t))});
-\draw[color={rgb,255:red,0;green,0;blue,255},line width=0.56pt] plot[domain=0.0000:156.0543,samples=34,smooth,variable=\t] ({0.00000+5.36048*(-0.91705*cos(\t)+-0.01311*sin(\t))},{0.00000+5.36048*(0.06924*cos(\t)+-0.98951*sin(\t))},{-0.00000+5.36048*(0.39271*cos(\t)+0.14387*sin(\t))});
-\draw[color={rgb,255:red,0;green,0;blue,255},line width=0.56pt] plot[domain=336.0543:360.0000,samples=8,smooth,variable=\t] ({0.00000+5.36048*(-0.91705*cos(\t)+-0.01311*sin(\t))},{0.00000+5.36048*(0.06924*cos(\t)+-0.98951*sin(\t))},{-0.00000+5.36048*(0.39271*cos(\t)+0.14387*sin(\t))});
-\draw[color={rgb,255:red,0;green,0;blue,0},line width=0.56pt] plot[domain=0.0000:24.4356,samples=8,smooth,variable=\t] ({-0.00000+5.36048*(-0.91705*cos(\t)+-0.04595*sin(\t))},{0.00000+5.36048*(0.06924*cos(\t)+0.95990*sin(\t))},{-0.00000+5.36048*(0.39271*cos(\t)+-0.27655*sin(\t))});
-\draw[color={rgb,255:red,0;green,0;blue,0},line width=0.56pt] plot[domain=204.4356:360.0000,samples=34,smooth,variable=\t] ({-0.00000+5.36048*(-0.91705*cos(\t)+-0.04595*sin(\t))},{0.00000+5.36048*(0.06924*cos(\t)+0.95990*sin(\t))},{-0.00000+5.36048*(0.39271*cos(\t)+-0.27655*sin(\t))});
-\draw[color={rgb,255:red,127;green,0;blue,255},line width=0.38pt] plot[domain=86.2829:260.9488,samples=38,smooth,variable=\t] ({0.51385+5.33112*(-0.00000*cos(\t)+-0.39876*sin(\t))},{-0.03880+5.33112*(0.98481*cos(\t)+-0.15925*sin(\t))},{-0.22004+5.33112*(-0.17365*cos(\t)+-0.90312*sin(\t))});
-\draw[color={rgb,255:red,127;green,0;blue,255},line width=0.38pt] plot[domain=0.0000:86.2829,samples=19,smooth,variable=\t] ({-0.51385+5.33112*(0.00000*cos(\t)+0.39876*sin(\t))},{0.03880+5.33112*(-0.98481*cos(\t)+0.15925*sin(\t))},{0.22004+5.33112*(0.17365*cos(\t)+0.90312*sin(\t))});
-\draw[color={rgb,255:red,127;green,0;blue,255},line width=0.38pt] plot[domain=260.9488:360.0000,samples=22,smooth,variable=\t] ({-0.51385+5.33112*(0.00000*cos(\t)+0.39876*sin(\t))},{0.03880+5.33112*(-0.98481*cos(\t)+0.15925*sin(\t))},{0.22004+5.33112*(0.17365*cos(\t)+0.90312*sin(\t))});
-\draw[color={rgb,255:red,0;green,0;blue,0},line width=0.74pt] plot[domain=0.0000:146.8282,samples=32,smooth,variable=\t] ({-0.00000+5.36048*(0.00000*cos(\t)+-0.99716*sin(\t))},{0.00000+5.36048*(-0.00000*cos(\t)+0.07529*sin(\t))},{0.00000+5.36048*(1.00000*cos(\t)+0.00000*sin(\t))});
-\draw[color={rgb,255:red,0;green,0;blue,0},line width=0.74pt] plot[domain=326.8282:360.0000,samples=8,smooth,variable=\t] ({-0.00000+5.36048*(0.00000*cos(\t)+-0.99716*sin(\t))},{0.00000+5.36048*(-0.00000*cos(\t)+0.07529*sin(\t))},{0.00000+5.36048*(1.00000*cos(\t)+0.00000*sin(\t))});
-\draw[color={rgb,255:red,255;green,0;blue,0},line width=0.56pt] plot[domain=0.0000:24.2232,samples=8,smooth,variable=\t] ({0.00000+5.36048*(-0.91705*cos(\t)+-0.02689*sin(\t))},{0.00000+5.36048*(0.06924*cos(\t)+0.97183*sin(\t))},{-0.00000+5.36048*(0.39271*cos(\t)+-0.23415*sin(\t))});
-\draw[color={rgb,255:red,255;green,0;blue,0},line width=0.56pt] plot[domain=204.2232:360.0000,samples=34,smooth,variable=\t] ({0.00000+5.36048*(-0.91705*cos(\t)+-0.02689*sin(\t))},{0.00000+5.36048*(0.06924*cos(\t)+0.97183*sin(\t))},{-0.00000+5.36048*(0.39271*cos(\t)+-0.23415*sin(\t))});
+\draw[color={rgb,255:red,128;green,0;blue,0},line width=0.56pt] plot[domain=0.0000:91.7447,samples=20,smooth,variable=\t] ({-0.57786+5.32827*(-0.05682*cos(\t)+-0.16409*sin(\t))},{-0.00000+5.32827*(-0.94495*cos(\t)+0.32720*sin(\t))},{-0.10189+5.32827*(0.32223*cos(\t)+0.93060*sin(\t))});
+\draw[color={rgb,255:red,128;green,0;blue,0},line width=0.56pt] plot[domain=266.7728:360.0000,samples=20,smooth,variable=\t] ({-0.57786+5.32827*(-0.05682*cos(\t)+-0.16409*sin(\t))},{-0.00000+5.32827*(-0.94495*cos(\t)+0.32720*sin(\t))},{-0.10189+5.32827*(0.32223*cos(\t)+0.93060*sin(\t))});
+\draw[color={rgb,255:red,255;green,0;blue,0},line width=0.9199999999999999pt] plot[domain=0.0000:129.0642,samples=28,smooth,variable=\t] ({-0.00000+5.36048*(0.05362*cos(\t)+-0.33940*sin(\t))},{0.00000+5.36048*(-0.95113*cos(\t)+-0.30377*sin(\t))},{0.00000+5.36048*(-0.30410*cos(\t)+0.89024*sin(\t))});
+\draw[color={rgb,255:red,255;green,0;blue,0},line width=0.9199999999999999pt] plot[domain=309.0642:360.0000,samples=11,smooth,variable=\t] ({-0.00000+5.36048*(0.05362*cos(\t)+-0.33940*sin(\t))},{0.00000+5.36048*(-0.95113*cos(\t)+-0.30377*sin(\t))},{0.00000+5.36048*(-0.30410*cos(\t)+0.89024*sin(\t))});
+\draw[color={rgb,255:red,255;green,0;blue,0},line width=0.56pt] plot[domain=112.8668:292.8668,samples=40,smooth,variable=\t] ({-0.00000+5.36048*(0.02716*cos(\t)+0.99963*sin(\t))},{0.00000+5.36048*(0.98769*cos(\t)+-0.02716*sin(\t))},{-0.00000+5.36048*(-0.15406*cos(\t)+0.00211*sin(\t))});
+\draw[color={rgb,255:red,0;green,0;blue,255},line width=0.56pt] plot[domain=0.0000:170.5572,samples=37,smooth,variable=\t] ({0.00000+5.36048*(-0.83494*cos(\t)+-0.16675*sin(\t))},{0.00000+5.36048*(0.06924*cos(\t)+-0.97725*sin(\t))},{-0.00000+5.36048*(-0.54597*cos(\t)+0.13106*sin(\t))});
+\draw[color={rgb,255:red,0;green,0;blue,255},line width=0.56pt] plot[domain=350.5572:360.0000,samples=8,smooth,variable=\t] ({0.00000+5.36048*(-0.83494*cos(\t)+-0.16675*sin(\t))},{0.00000+5.36048*(0.06924*cos(\t)+-0.97725*sin(\t))},{-0.00000+5.36048*(-0.54597*cos(\t)+0.13106*sin(\t))});
+\draw[color={rgb,255:red,0;green,0;blue,0},line width=0.56pt] plot[domain=0.0000:9.2286,samples=8,smooth,variable=\t] ({0.00000+5.36048*(-0.83494*cos(\t)+0.24244*sin(\t))},{0.00000+5.36048*(0.06924*cos(\t)+0.93689*sin(\t))},{-0.00000+5.36048*(-0.54597*cos(\t)+-0.25193*sin(\t))});
+\draw[color={rgb,255:red,0;green,0;blue,0},line width=0.56pt] plot[domain=189.2286:360.0000,samples=37,smooth,variable=\t] ({0.00000+5.36048*(-0.83494*cos(\t)+0.24244*sin(\t))},{0.00000+5.36048*(0.06924*cos(\t)+0.93689*sin(\t))},{-0.00000+5.36048*(-0.54597*cos(\t)+-0.25193*sin(\t))});
+\draw[color={rgb,255:red,127;green,0;blue,255},line width=0.38pt] plot[domain=0.0000:122.9832,samples=27,smooth,variable=\t] ({0.46783+5.33112*(0.03015*cos(\t)+-0.54952*sin(\t))},{-0.03880+5.33112*(-0.98481*cos(\t)+-0.15925*sin(\t))},{0.30592+5.33112*(-0.17101*cos(\t)+0.82017*sin(\t))});
+\draw[color={rgb,255:red,127;green,0;blue,255},line width=0.38pt] plot[domain=304.9336:360.0000,samples=12,smooth,variable=\t] ({0.46783+5.33112*(0.03015*cos(\t)+-0.54952*sin(\t))},{-0.03880+5.33112*(-0.98481*cos(\t)+-0.15925*sin(\t))},{0.30592+5.33112*(-0.17101*cos(\t)+0.82017*sin(\t))});
+\draw[color={rgb,255:red,127;green,0;blue,255},line width=0.38pt] plot[domain=122.9832:304.9336,samples=40,smooth,variable=\t] ({-0.46783+5.33112*(-0.03015*cos(\t)+0.54952*sin(\t))},{0.03880+5.33112*(0.98481*cos(\t)+0.15925*sin(\t))},{-0.30592+5.33112*(0.17101*cos(\t)+-0.82017*sin(\t))});
+\draw[color={rgb,255:red,0;green,0;blue,0},line width=0.74pt] plot[domain=0.0000:146.3074,samples=32,smooth,variable=\t] ({0.00000+5.36048*(-0.00000*cos(\t)+-0.99658*sin(\t))},{-0.00000+5.36048*(0.00000*cos(\t)+0.08265*sin(\t))},{0.00000+5.36048*(1.00000*cos(\t)+-0.00000*sin(\t))});
+\draw[color={rgb,255:red,0;green,0;blue,0},line width=0.74pt] plot[domain=326.3074:360.0000,samples=8,smooth,variable=\t] ({0.00000+5.36048*(-0.00000*cos(\t)+-0.99658*sin(\t))},{-0.00000+5.36048*(0.00000*cos(\t)+0.08265*sin(\t))},{0.00000+5.36048*(1.00000*cos(\t)+-0.00000*sin(\t))});
+\draw[color={rgb,255:red,255;green,0;blue,0},line width=0.56pt] plot[domain=0.0000:9.2703,samples=8,smooth,variable=\t] ({0.00000+5.36048*(-0.83494*cos(\t)+0.22046*sin(\t))},{0.00000+5.36048*(0.06924*cos(\t)+0.95106*sin(\t))},{-0.00000+5.36048*(-0.54597*cos(\t)+-0.21652*sin(\t))});
+\draw[color={rgb,255:red,255;green,0;blue,0},line width=0.56pt] plot[domain=189.2703:360.0000,samples=37,smooth,variable=\t] ({0.00000+5.36048*(-0.83494*cos(\t)+0.22046*sin(\t))},{0.00000+5.36048*(0.06924*cos(\t)+0.95106*sin(\t))},{-0.00000+5.36048*(-0.54597*cos(\t)+-0.21652*sin(\t))});
 \draw[color={rgb,255:red,0;green,0;blue,0},line width=0.56pt] plot[domain=0.0000:66.1574,samples=14,smooth,variable=\t] ({0.00000+5.34008*(0.00000*cos(\t)+1.00000*sin(\t))},{0.00000+5.34008*(-1.00000*cos(\t)+0.00000*sin(\t))},{0.46720+5.34008*(0.00000*cos(\t)+-0.00000*sin(\t))});
 \draw[color={rgb,255:red,0;green,0;blue,0},line width=0.56pt] plot[domain=243.8426:360.0000,samples=25,smooth,variable=\t] ({0.00000+5.34008*(0.00000*cos(\t)+1.00000*sin(\t))},{0.00000+5.34008*(-1.00000*cos(\t)+0.00000*sin(\t))},{0.46720+5.34008*(0.00000*cos(\t)+-0.00000*sin(\t))});
 \draw[color={rgb,255:red,0;green,0;blue,0},line width=0.56pt] plot[domain=0.0000:66.8594,samples=14,smooth,variable=\t] ({0.00000+5.30831*(0.00000*cos(\t)+1.00000*sin(\t))},{0.00000+5.30831*(-1.00000*cos(\t)+0.00000*sin(\t))},{0.74603+5.30831*(0.00000*cos(\t)+-0.00000*sin(\t))});
 \draw[color={rgb,255:red,0;green,0;blue,0},line width=0.56pt] plot[domain=243.1406:360.0000,samples=25,smooth,variable=\t] ({0.00000+5.30831*(0.00000*cos(\t)+1.00000*sin(\t))},{0.00000+5.30831*(-1.00000*cos(\t)+0.00000*sin(\t))},{0.74603+5.30831*(0.00000*cos(\t)+-0.00000*sin(\t))});
-\draw[color={rgb,255:red,0;green,0;blue,0},line width=0.56pt] plot[domain=0.0000:91.5122,samples=20,smooth,variable=\t] ({-0.00000+5.36048*(0.13046*cos(\t)+-0.03212*sin(\t))},{0.00000+5.36048*(-0.96219*cos(\t)+0.23692*sin(\t))},{0.00000+5.36048*(0.23909*cos(\t)+0.97100*sin(\t))});
-\draw[color={rgb,255:red,0;green,0;blue,0},line width=0.56pt] plot[domain=271.5122:360.0000,samples=19,smooth,variable=\t] ({-0.00000+5.36048*(0.13046*cos(\t)+-0.03212*sin(\t))},{0.00000+5.36048*(-0.96219*cos(\t)+0.23692*sin(\t))},{0.00000+5.36048*(0.23909*cos(\t)+0.97100*sin(\t))});
-\draw[color={rgb,255:red,0;green,0;blue,255},line width=1.46pt] plot[domain=0.0000:5.3000,samples=8,smooth,variable=\t] ({0.00000+5.36048*(0.13046*cos(\t)+-0.90889*sin(\t))},{0.00000+5.36048*(-0.96219*cos(\t)+-0.01972*sin(\t))},{0.00000+5.36048*(0.23909*cos(\t)+0.41657*sin(\t))});
+\draw[color={rgb,255:red,0;green,0;blue,0},line width=0.56pt] plot[domain=0.0000:85.9121,samples=19,smooth,variable=\t] ({-0.00000+5.36048*(-0.16428*cos(\t)+0.05191*sin(\t))},{-0.00000+5.36048*(-0.93928*cos(\t)+0.29678*sin(\t))},{-0.00000+5.36048*(0.30129*cos(\t)+0.95353*sin(\t))});
+\draw[color={rgb,255:red,0;green,0;blue,0},line width=0.56pt] plot[domain=265.9121:360.0000,samples=20,smooth,variable=\t] ({-0.00000+5.36048*(-0.16428*cos(\t)+0.05191*sin(\t))},{-0.00000+5.36048*(-0.93928*cos(\t)+0.29678*sin(\t))},{-0.00000+5.36048*(0.30129*cos(\t)+0.95353*sin(\t))});
+\draw[color={rgb,255:red,0;green,0;blue,255},line width=1.46pt] plot[domain=0.0000:5.3000,samples=8,smooth,variable=\t] ({0.00000+5.36048*(-0.16428*cos(\t)+-0.85376*sin(\t))},{0.00000+5.36048*(-0.93928*cos(\t)+-0.01759*sin(\t))},{0.00000+5.36048*(0.30129*cos(\t)+-0.52037*sin(\t))});
 % --- segments ---
 \draw[color={rgb,255:red,0;green,0;blue,0},line width=1.0999999999999999pt] (0.00000,-5.36048,0.00000) -- (0.00000,0.00000,0.00000);
-\draw[color={rgb,255:red,0;green,0;blue,0},line width=1.0999999999999999pt] (0.00002,-5.20228,1.29269) -- (0.00000,0.00000,0.00000);
-\draw[color={rgb,255:red,255;green,0;blue,0},line width=0.74pt] (0.00000,0.00000,0.00000) -- (0.69933,-5.15782,1.28164);
-\draw[color={rgb,255:red,255;green,0;blue,0},line width=0.74pt] (0.00000,0.00000,0.66019) -- (0.70744,-5.21764,1.00522);
-\draw[color={rgb,255:red,255;green,0;blue,0},line width=0.56pt] (0.69933,-5.15782,1.28164) -- (0.69931,-0.30668,0.07620);
-\begin{pgfonlayer}{back}
-\draw[color={rgb,255:red,255;green,0;blue,0},line width=0.42pt,dashed,opacity=0.4] (0.69931,-0.30668,0.07620) -- (0.69931,0.00000,-0.00001);
-\end{pgfonlayer}
-\draw[color={rgb,255:red,255;green,0;blue,0},line width=0.56pt] (0.69931,-5.31467,0.00000) -- (0.69931,-0.32610,-0.00001);
-\begin{pgfonlayer}{back}
-\draw[color={rgb,255:red,255;green,0;blue,0},line width=0.42pt,dashed,opacity=0.4] (0.69931,-0.32610,-0.00001) -- (0.69931,0.00000,-0.00001);
-\end{pgfonlayer}
+\draw[color={rgb,255:red,0;green,0;blue,0},line width=1.0999999999999999pt] (0.28743,-5.09851,-1.63012) -- (0.00000,0.00000,0.00000);
+\draw[color={rgb,255:red,255;green,0;blue,0},line width=0.74pt] (0.00000,0.00000,0.00000) -- (-0.88060,-5.03497,1.61504);
+\draw[color={rgb,255:red,255;green,0;blue,0},line width=0.74pt] (0.00000,0.00000,0.66019) -- (-0.89398,-5.11144,1.34491);
+\draw[color={rgb,255:red,255;green,0;blue,0},line width=0.56pt] (-0.88060,-5.03497,1.61504) -- (-0.57786,-0.00000,-0.10189);
+\draw[color={rgb,255:red,255;green,0;blue,0},line width=0.56pt] (-0.59583,-5.32726,0.00000) -- (-0.57786,-0.00000,-0.10189);
 % --- vectors ---
 \draw[->,>=Latex,line width=0.74pt,color={rgb,255:red,0;green,0;blue,0}] (0.00000,0.00000,5.36048) -- (0.00000,0.00000,6.43258);
-\draw[->,>=Latex,line width=0.56pt,color={rgb,255:red,0;green,0;blue,255}] (-5.36048,-0.00000,0.00009) -- (-6.43258,-0.00000,0.00011);
-\draw[->,>=Latex,line width=0.56pt,color={rgb,255:red,0;green,0;blue,255}] (5.36048,0.00000,-0.00009) -- (6.43258,0.00000,-0.00011);
+\draw[->,>=Latex,line width=0.56pt,color={rgb,255:red,0;green,0;blue,255}] (-5.27904,-0.00000,-0.93084) -- (-6.33485,-0.00000,-1.11701);
+\draw[->,>=Latex,line width=0.56pt,color={rgb,255:red,0;green,0;blue,255}] (5.27904,0.00000,0.93084) -- (6.33485,0.00000,1.11701);
 % --- axes ---
 \draw[->,thin,gray] (0,0,0) -- (1.87617,0,0) node[anchor=west,font=\tiny,gray]{$x$};
 \draw[->,thin,gray] (0,0,0) -- (0,1.87617,0) node[anchor=south,font=\tiny,gray]{$y$};
 \draw[->,thin,gray] (0,0,0) -- (0,0,1.87617) node[anchor=south,font=\tiny,gray]{$z$};
-\begin{pgfonlayer}{back}
-\fill[yellow!70!orange,opacity=0.55] (1.06877,4.99860,1.61445) circle (1.2pt);
-\end{pgfonlayer}
-\begin{pgfonlayer}{back}
-\fill[yellow!70!orange,opacity=0.55] (1.85118,3.37879,3.72715) circle (1.2pt);
+\begin{pgfonlayer}{front}
+\fill[yellow!70!orange,opacity=1] (1.61282,-4.14497,-2.99212) circle (1.2pt);
 \end{pgfonlayer}
 \begin{pgfonlayer}{back}
-\fill[yellow!70!orange,opacity=0.55] (2.13757,0.85363,4.84116) circle (1.2pt);
-\end{pgfonlayer}
-\begin{pgfonlayer}{front}
-\fill[yellow!70!orange,opacity=1] (1.85120,-1.90025,4.65799) circle (1.2pt);
-\end{pgfonlayer}
-\begin{pgfonlayer}{front}
-\fill[yellow!70!orange,opacity=1] (1.06880,-4.14497,3.22671) circle (1.2pt);
-\end{pgfonlayer}
-\begin{pgfonlayer}{front}
-\fill[yellow!70!orange,opacity=1] (0.00002,-5.27904,0.93084) circle (1.2pt);
-\end{pgfonlayer}
-\begin{pgfonlayer}{front}
-\fill[yellow!70!orange,opacity=1] (-1.06877,-4.99860,-1.61445) circle (1.2pt);
-\end{pgfonlayer}
-\begin{pgfonlayer}{front}
-\fill[yellow!70!orange,opacity=1] (-1.85118,-3.37879,-3.72715) circle (1.2pt);
-\end{pgfonlayer}
-\begin{pgfonlayer}{front}
-\fill[yellow!70!orange,opacity=1] (-2.13757,-0.85363,-4.84116) circle (1.2pt);
+\fill[yellow!70!orange,opacity=0.55] (2.63185,-1.90025,-4.26581) circle (1.2pt);
 \end{pgfonlayer}
 \begin{pgfonlayer}{back}
-\fill[yellow!70!orange,opacity=0.55] (-1.85120,1.90025,-4.65799) circle (1.2pt);
+\fill[yellow!70!orange,opacity=0.55] (2.94568,0.85363,-4.39648) circle (1.2pt);
 \end{pgfonlayer}
 \begin{pgfonlayer}{back}
-\fill[yellow!70!orange,opacity=0.55] (-1.06880,4.14497,-3.22671) circle (1.2pt);
+\fill[yellow!70!orange,opacity=0.55] (2.47021,3.37879,-3.34912) circle (1.2pt);
+\end{pgfonlayer}
+\begin{pgfonlayer}{back}
+\fill[yellow!70!orange,opacity=0.55] (1.33286,4.99860,-1.40436) circle (1.2pt);
+\end{pgfonlayer}
+\begin{pgfonlayer}{back}
+\fill[yellow!70!orange,opacity=0.55] (-0.16164,5.27904,0.91670) circle (1.2pt);
+\end{pgfonlayer}
+\begin{pgfonlayer}{back}
+\fill[yellow!70!orange,opacity=0.55] (-1.61282,4.14497,2.99212) circle (1.2pt);
+\end{pgfonlayer}
+\begin{pgfonlayer}{front}
+\fill[yellow!70!orange,opacity=1] (-2.63185,1.90025,4.26581) circle (1.2pt);
+\end{pgfonlayer}
+\begin{pgfonlayer}{front}
+\fill[yellow!70!orange,opacity=1] (-2.94568,-0.85363,4.39648) circle (1.2pt);
+\end{pgfonlayer}
+\begin{pgfonlayer}{front}
+\fill[yellow!70!orange,opacity=1] (-2.47021,-3.37879,3.34912) circle (1.2pt);
+\end{pgfonlayer}
+\begin{pgfonlayer}{front}
+\fill[yellow!70!orange,opacity=1] (-1.33286,-4.99860,1.40436) circle (1.2pt);
 \end{pgfonlayer}
 \begin{pgfonlayer}{midback}
 \begin{scope}[tdplot_screen_coords]
@@ -187,37 +181,37 @@
 \fill[orange,opacity=0.55] (0.00000,5.36048,0.00000) circle (2pt);
 \end{pgfonlayer}
 \begin{pgfonlayer}{front}
-\fill[blue,opacity=1] (-5.36048,-0.00000,0.00009) circle (2pt);
+\fill[blue,opacity=1] (-5.27904,-0.00000,-0.93084) circle (2pt);
 \end{pgfonlayer}
 \begin{pgfonlayer}{back}
-\fill[blue,opacity=0.55] (5.36048,0.00000,-0.00009) circle (2pt);
+\fill[blue,opacity=0.55] (5.27904,0.00000,0.93084) circle (2pt);
 \end{pgfonlayer}
 \begin{pgfonlayer}{front}
-\fill[violet,opacity=1] (-4.91585,0.37117,2.10510) circle (1.6pt);
+\fill[violet,opacity=1] (-4.47567,0.37117,-2.92667) circle (1.6pt);
 \end{pgfonlayer}
 \begin{pgfonlayer}{back}
-\fill[violet,opacity=0.55] (4.91585,-0.37117,-2.10510) circle (1.6pt);
+\fill[violet,opacity=0.55] (4.47567,-0.37117,2.92667) circle (1.6pt);
+\end{pgfonlayer}
+\begin{pgfonlayer}{front}
+\fill[red,opacity=1] (0.16164,-5.27904,-0.91670) circle (1.8pt);
 \end{pgfonlayer}
 \begin{pgfonlayer}{back}
-\fill[red,opacity=0.55] (-0.00002,5.27904,-0.93084) circle (1.8pt);
+\fill[red,opacity=0.55] (-0.16164,5.27904,0.91670) circle (1.8pt);
+\end{pgfonlayer}
+\begin{pgfonlayer}{back}
+\fill[orange,opacity=0.55] (-1.61282,4.14497,2.99212) circle (2.4pt);
 \end{pgfonlayer}
 \begin{pgfonlayer}{front}
-\fill[red,opacity=1] (0.00002,-5.27904,0.93084) circle (1.8pt);
+\fill[black,opacity=1] (-0.44303,-5.34214,-0.00000) circle (1.6pt);
 \end{pgfonlayer}
 \begin{pgfonlayer}{front}
-\fill[orange,opacity=1] (-1.06877,-4.99860,-1.61445) circle (2.4pt);
+\fill[red,opacity=1] (-1.29958,-5.02216,1.35048) circle (2pt);
 \end{pgfonlayer}
 \begin{pgfonlayer}{front}
-\fill[black,opacity=1] (-0.40359,-5.34527,-0.00000) circle (1.6pt);
+\fill[orange,opacity=1] (-0.88060,-5.03497,1.61504) circle (2.4pt);
 \end{pgfonlayer}
 \begin{pgfonlayer}{front}
-\fill[red,opacity=1] (0.24630,-5.14553,1.48243) circle (2pt);
-\end{pgfonlayer}
-\begin{pgfonlayer}{front}
-\fill[orange,opacity=1] (0.69933,-5.15782,1.28164) circle (2.4pt);
-\end{pgfonlayer}
-\begin{pgfonlayer}{front}
-\fill[violet,opacity=1] (0.00002,-5.20228,1.29269) circle (1.6pt);
+\fill[violet,opacity=1] (0.28743,-5.09851,-1.63012) circle (1.6pt);
 \end{pgfonlayer}
 \begin{pgfonlayer}{front}
 \fill[red,opacity=1] (0.00000,0.00000,5.36048) circle (2pt);
@@ -225,29 +219,29 @@
 \begin{pgfonlayer}{back}
 \fill[gray,opacity=0.55] (-0.00000,0.00000,-5.36048) circle (1.8pt);
 \end{pgfonlayer}
-\begin{pgfonlayer}{back}
-\fill[gray!60!black,opacity=0.55] (0.69931,0.00000,-0.00001) circle (1pt);
+\begin{pgfonlayer}{front}
+\fill[gray!60!black,opacity=1] (-0.57786,-0.00000,-0.10189) circle (1pt);
 \end{pgfonlayer}
 \begin{pgfonlayer}{front}
-\fill[gray!60!black,opacity=1] (0.69931,-5.31467,0.00000) circle (1pt);
+\fill[gray!60!black,opacity=1] (-0.59583,-5.32726,0.00000) circle (1pt);
 \end{pgfonlayer}
 \begin{pgfonlayer}{back}
-\fill[gray!60!black,opacity=0.55] (0.69931,5.31467,-0.00000) circle (1pt);
+\fill[gray!60!black,opacity=0.55] (-0.59583,5.32726,-0.00000) circle (1pt);
 \end{pgfonlayer}
 \begin{pgfonlayer}{back}
-\fill[orange,opacity=0.55] (-0.69933,5.15782,-1.28164) circle (2.4pt);
-\end{pgfonlayer}
-\begin{pgfonlayer}{back}
-\fill[orange,opacity=0.55] (1.06877,4.99860,1.61445) circle (2.4pt);
+\fill[orange,opacity=0.55] (0.88060,5.03497,-1.61504) circle (2.4pt);
 \end{pgfonlayer}
 \begin{pgfonlayer}{front}
-\fill[white,opacity=1] (0.16070,-5.19994,1.29211) circle (2.0pt);
-\end{pgfonlayer}
-\begin{pgfonlayer}{back}
-\fill[white,opacity=0.55] (-0.16070,5.19994,-1.29211) circle (2.0pt);
+\fill[orange,opacity=1] (1.61282,-4.14497,-2.99212) circle (2.4pt);
 \end{pgfonlayer}
 \begin{pgfonlayer}{front}
-\fill[gray!60!black,opacity=1] (-0.07025,-5.30425,0.77120) circle (1.4pt);
+\fill[white,opacity=1] (-0.15836,-5.34044,-0.43512) circle (2.0pt);
+\end{pgfonlayer}
+\begin{pgfonlayer}{back}
+\fill[white,opacity=0.55] (0.15836,5.34044,0.43512) circle (2.0pt);
+\end{pgfonlayer}
+\begin{pgfonlayer}{front}
+\fill[gray!60!black,opacity=1] (-0.89384,-5.23853,0.70255) circle (1.4pt);
 \end{pgfonlayer}
 \begin{pgfonlayer}{front}
 \fill[blue!50!black,opacity=1] (0.00000,0.00000,0.66019) circle (1.6pt);
@@ -256,35 +250,35 @@
 \fill[blue!50!black,opacity=1] (0.00000,0.00000,3.76253) circle (1.6pt);
 \end{pgfonlayer}
 \begin{pgfonlayer}{front}
-\fill[orange,opacity=1] (0.49086,-3.62028,0.89959) circle (2.4pt);
+\fill[orange,opacity=1] (-0.61810,-3.53406,1.13360) circle (2.4pt);
 \end{pgfonlayer}
 \begin{pgfonlayer}{front}
-\fill[red,opacity=1] (0.70744,-5.21764,1.00522) circle (2.4pt);
+\fill[red,opacity=1] (-0.89398,-5.11144,1.34491) circle (2.4pt);
 \end{pgfonlayer}
 % --- labels ---
 \node[above left=1pt,font=\fa\footnotesize,inner sep=0.5pt,fill=white,fill opacity=0.55,text opacity=1,rounded corners=1pt] at (-5.36048,0.00000,0.00000) {\RL{شمال}};
 \node[below right=1pt,font=\fa\footnotesize,inner sep=0.5pt,fill=white,fill opacity=0.55,text opacity=1,rounded corners=1pt] at (5.36048,0.00000,0.00000) {\RL{جنوب}};
 \node[left=4pt,font=\fa\footnotesize,inner sep=0.5pt,fill=white,fill opacity=0.55,text opacity=1,rounded corners=1pt] at (0.00000,-5.36048,0.00000) {\RL{غرب}};
 \node[right=4pt,font=\fa\footnotesize,inner sep=0.5pt,fill=white,fill opacity=0.55,text opacity=1,rounded corners=1pt] at (0.00000,5.36048,0.00000) {\RL{شرق}};
-\node[above right=1pt,font=\fa\footnotesize,inner sep=0.5pt,fill=white,fill opacity=0.55,text opacity=1,rounded corners=1pt] at (-5.36048,-0.00000,0.00009) {\RL{ق ش}};
-\node[below left=1pt,font=\fa\footnotesize,inner sep=0.5pt,fill=white,fill opacity=0.55,text opacity=1,rounded corners=1pt] at (5.36048,0.00000,-0.00009) {\RL{ق ج}};
-\node[above left=8pt,font=\fa\footnotesize,inner sep=0.5pt,fill=white,fill opacity=0.55,text opacity=1,rounded corners=1pt] at (-4.91585,0.37117,2.10510) {\RL{ق م}};
-\node[below right=8pt,font=\fa\footnotesize,inner sep=0.5pt,fill=white,fill opacity=0.55,text opacity=1,rounded corners=1pt] at (4.91585,-0.37117,-2.10510) {\RL{ق م}};
-\node[above right=2pt,font=\fa\footnotesize,inner sep=0.5pt,fill=white,fill opacity=0.55,text opacity=1,rounded corners=1pt] at (-0.00002,5.27904,-0.93084) {\RL{حمل}};
-\node[below left=2pt,font=\fa\footnotesize,inner sep=0.5pt,fill=white,fill opacity=0.55,text opacity=1,rounded corners=1pt] at (0.00002,-5.27904,0.93084) {\RL{میزان}};
-\node[above=4pt,font=\fa\footnotesize,inner sep=0.5pt,fill=white,fill opacity=0.55,text opacity=1,rounded corners=1pt] at (-1.06877,-4.99860,-1.61445) {\RL{شمس}};
-\node[left=4pt,font=\fa\footnotesize,inner sep=0.5pt,fill=white,fill opacity=0.55,text opacity=1,rounded corners=1pt] at (0.24630,-5.14553,1.48243) {\RL{مو قمر}};
-\node[right=3pt,font=\fa\footnotesize,inner sep=0.5pt,fill=white,fill opacity=0.55,text opacity=1,rounded corners=1pt] at (0.69933,-5.15782,1.28164) {\RL{قمر}};
-\node[right=3pt,font=\fa\footnotesize,inner sep=0.5pt,fill=white,fill opacity=0.55,text opacity=1,rounded corners=1pt] at (-0.69933,5.15782,-1.28164) {\RL{ن قمر}};
-\node[above=4pt,font=\fa\footnotesize,inner sep=0.5pt,fill=white,fill opacity=0.55,text opacity=1,rounded corners=1pt] at (1.06877,4.99860,1.61445) {\RL{ن شمس}};
-\node[below=3pt,font=\fa\footnotesize,inner sep=0.5pt,fill=white,fill opacity=0.55,text opacity=1,rounded corners=1pt] at (0.16070,-5.19994,1.29211) {\RL{قمر معدل}};
-\node[above=3pt,font=\fa\footnotesize,inner sep=0.5pt,fill=white,fill opacity=0.55,text opacity=1,rounded corners=1pt] at (-0.16070,5.19994,-1.29211) {\RL{ن قمر معدل}};
-\node[above right=1pt,font=\tiny] at (0.69931,0.00000,-0.00001) {$G$};
-\node[below=1pt,font=\tiny] at (0.69931,-5.31467,0.00000) {$K$};
-\node[above=1pt,font=\tiny] at (0.69931,5.31467,-0.00000) {$M$};
+\node[above right=1pt,font=\fa\footnotesize,inner sep=0.5pt,fill=white,fill opacity=0.55,text opacity=1,rounded corners=1pt] at (-5.27904,-0.00000,-0.93084) {\RL{ق ش}};
+\node[below left=1pt,font=\fa\footnotesize,inner sep=0.5pt,fill=white,fill opacity=0.55,text opacity=1,rounded corners=1pt] at (5.27904,0.00000,0.93084) {\RL{ق ج}};
+\node[above left=8pt,font=\fa\footnotesize,inner sep=0.5pt,fill=white,fill opacity=0.55,text opacity=1,rounded corners=1pt] at (-4.47567,0.37117,-2.92667) {\RL{ق م}};
+\node[below right=8pt,font=\fa\footnotesize,inner sep=0.5pt,fill=white,fill opacity=0.55,text opacity=1,rounded corners=1pt] at (4.47567,-0.37117,2.92667) {\RL{ق م}};
+\node[above right=2pt,font=\fa\footnotesize,inner sep=0.5pt,fill=white,fill opacity=0.55,text opacity=1,rounded corners=1pt] at (0.16164,-5.27904,-0.91670) {\RL{حمل}};
+\node[below left=2pt,font=\fa\footnotesize,inner sep=0.5pt,fill=white,fill opacity=0.55,text opacity=1,rounded corners=1pt] at (-0.16164,5.27904,0.91670) {\RL{میزان}};
+\node[above=4pt,font=\fa\footnotesize,inner sep=0.5pt,fill=white,fill opacity=0.55,text opacity=1,rounded corners=1pt] at (-1.61282,4.14497,2.99212) {\RL{شمس}};
+\node[left=4pt,font=\fa\footnotesize,inner sep=0.5pt,fill=white,fill opacity=0.55,text opacity=1,rounded corners=1pt] at (-1.29958,-5.02216,1.35048) {\RL{مو قمر}};
+\node[right=3pt,font=\fa\footnotesize,inner sep=0.5pt,fill=white,fill opacity=0.55,text opacity=1,rounded corners=1pt] at (-0.88060,-5.03497,1.61504) {\RL{قمر}};
+\node[right=3pt,font=\fa\footnotesize,inner sep=0.5pt,fill=white,fill opacity=0.55,text opacity=1,rounded corners=1pt] at (0.88060,5.03497,-1.61504) {\RL{ن قمر}};
+\node[above=4pt,font=\fa\footnotesize,inner sep=0.5pt,fill=white,fill opacity=0.55,text opacity=1,rounded corners=1pt] at (1.61282,-4.14497,-2.99212) {\RL{ن شمس}};
+\node[below=3pt,font=\fa\footnotesize,inner sep=0.5pt,fill=white,fill opacity=0.55,text opacity=1,rounded corners=1pt] at (-0.15836,-5.34044,-0.43512) {\RL{قمر معدل}};
+\node[above=3pt,font=\fa\footnotesize,inner sep=0.5pt,fill=white,fill opacity=0.55,text opacity=1,rounded corners=1pt] at (0.15836,5.34044,0.43512) {\RL{ن قمر معدل}};
+\node[above right=1pt,font=\tiny] at (-0.57786,-0.00000,-0.10189) {$G$};
+\node[below=1pt,font=\tiny] at (-0.59583,-5.32726,0.00000) {$K$};
+\node[above=1pt,font=\tiny] at (-0.59583,5.32726,-0.00000) {$M$};
 \node[left=2pt,font=\tiny] at (0.00000,0.00000,0.66019) {$H$};
 \node[left=2pt,font=\tiny] at (0.00000,0.00000,3.76253) {$I$};
-\node[above right=2pt,font=\tiny] at (0.49086,-3.62028,0.89959) {$L$};
-\node[below right=2pt,font=\tiny] at (0.70744,-5.21764,1.00522) {$J$};
+\node[above right=2pt,font=\tiny] at (-0.61810,-3.53406,1.13360) {$L$};
+\node[below right=2pt,font=\tiny] at (-0.89398,-5.11144,1.34491) {$J$};
 \end{tikzpicture}
 \end{document}

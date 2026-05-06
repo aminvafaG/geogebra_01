@@ -177,10 +177,13 @@ value (in radians).
 
 ### Phase 3 — Walk the construction
 
-The `<construction>` block lists `<element>` and `<command>` nodes
-interleaved in topological (dependency) order — GeoGebra always writes
-producers before consumers. So we just iterate children in document order.
-For each `<command>`:
+The `<construction>` block lists `<element>`, `<command>`, and
+`<expression>` nodes interleaved in topological (dependency) order —
+GeoGebra always writes producers before consumers. So we just iterate
+children in document order. `<expression>` nodes (e.g.
+`<expression label="cross" exp="u ⊗ v" type="vector"/>`) are evaluated
+through the inline evaluator and their result stored under the declared
+label. For each `<command>`:
 
 1. **Resolve inputs.** Each `<input a0="X" a1="Y" …/>` attribute value can
    be either a bare identifier (`B'`, `Line_moaddel`) or an inline
@@ -258,7 +261,7 @@ is registered in the `CMD` dispatch table.
 | `Distance[A, B]`    | euclidean distance                                                              | `Number`     |
 | `Angle[v1, v2]` / `Angle[A, V, B]` | angle in radians between two vectors / at a vertex                  | `Number`     |
 | `Sequence[…]`       | not needed by the renderer — returns `None`                                     | `None`       |
-| `If[…]`             | not on `Arz`'s chain — returns `None`                                           | `None`       |
+| `If[cond, then]` / `If[cond, then, else]` | picks a branch from a Python `bool` (or truthy `Number`); returns the chosen branch as-is | same as branch |
 
 Anything not in this table is treated as "leave the cache". For your
 specific construction this is fine; if you sweep a slider whose chain hits
@@ -274,11 +277,15 @@ sample file:
 
 | Inline string                | What it means |
 |------------------------------|---------------|
-| `Arz`                        | identifier — look up in scene |
+| `Arz`                        | identifier — look up in scene (unicode letters allowed, e.g. `θ_signed`, `α`, `β`) |
 | `yAxis` / `xAxis` / `zAxis`  | built-in coordinate axes |
 | `23.5°`                      | degrees → radians: `math.radians(23.5)` |
+| `BoadMoaddal / °`            | radians → degrees (bare `°` evaluates to `π/180`) |
 | `(-Taghvim)`                 | unary negation of a scene value |
 | `(1.2 * Sp)`                 | scalar × point → scaled point |
+| `u ⊗ v`                      | vector cross product → `Vector3D` |
+| `cross * n`                  | vector dot product → `Number` (when both operands are `Vector3D`) |
+| `sign_{1} > 0`               | comparison → Python `bool` (also `<`, `≤`, `≥`, `=`, `≠`); fed to `cmd_If` |
 | `Mirror[Ghamar, A]`          | nested function call |
 | `Intersect[C_Mentaghe, C_ofoghTaksiryGhamar, 2]` | nested call with index |
 | `(-9°)`                      | parenthesized negative angle |
@@ -288,10 +295,19 @@ The evaluator (`eval_inline` in [sweep.py](sweep.py)) handles each form
 by:
 
 1. Stripping redundant outer parentheses.
-2. Trying built-ins, then identifiers, then function-call syntax.
-3. Falling through to numeric parsing (with optional trailing `°`).
-4. Splitting on top-level `+ - * /` (parens/brackets respected) and
-   folding left-to-right.
+2. Trying built-ins, then identifiers, then function-call syntax (the
+   `Name[...]` matcher checks bracket pairing so `Distance[X] ≥ Distance[Y]`
+   isn't mis-parsed as one greedy call).
+3. Numeric parsing.
+4. Splitting on top-level operators in precedence order: comparison
+   (`< > ≤ ≥ ≠ =`) → `+ -` → `* / ⊗` (parens/brackets respected),
+   folding left-to-right within each level.
+5. Falling through to a trailing-`°` handler for atoms like `23.5°`.
+
+`<expression>` nodes in the construction (e.g. `cross = u ⊗ v`,
+`aaa = BoadMoaddal / °`) are evaluated alongside `<command>` nodes in
+document order, so dependent values follow the swept slider rather than
+freezing at their seeded cache.
 
 It is *not* a general-purpose expression evaluator — it covers the forms
 this construction uses and refuses anything else. If you hit
@@ -345,9 +361,11 @@ file and see a point flip to its antipodal partner, look here:
    ray that starts inside a sphere. Calibrated against
    `Intersect[i, a] -> J`.
 
-Validation: at the original `Arz = 36°`, the interpreter reproduces every
-cached `point3d` in the sample file to within 1e-4 (floating-point noise
-only). To re-check after edits:
+Validation: sweeping at the file's currently-saved slider value
+reproduces every cached `point3d` to ~1e-5 or better. The points routed
+through `If[…]` (`MagharebGhamr`, `GhamarMoaddal`, `GhamarMoaddal'`, `F`)
+agree to ~1e-5; the rest match within floating-point noise (~1e-14). To
+re-check after edits:
 
 ```bash
 python sweep.py ../Final_Helal_1404_BSe_BMo.ggb  Arz  36:1:36  -o /tmp/check  --no-pdf
@@ -365,17 +383,25 @@ python sweep.py ../Final_Helal_1404_BSe_BMo.ggb  Arz  36:1:36  -o /tmp/check  --
   [ggb2pdf.py](ggb2pdf.py), but if you load a swept `.ggb` back into
   GeoGebra it'll briefly show stale outlines until GeoGebra recomputes on
   load. Re-saving in GeoGebra refreshes them.
-- **No support for `If[…]`, `Sequence[…]` outputs.** Those return `None`
-  and the dependent objects stay at cached values. None of these are on
-  `Arz`'s chain in the sample file.
+- **`Sequence[…]` outputs are not recomputed.** Returns `None` and the
+  dependent objects stay at cached values. (`If[…]` *is* supported — see
+  §6/§7 — but its condition must reduce to a comparison the inline
+  evaluator can parse.)
 - **Booleans aren't recomputed.** They're typically user-toggle state in
   this file (e.g. "show altitude line"); the sweep preserves them. If a
   boolean were dynamically computed from the slider you'd need to extend
   the interpreter.
-- **No expression precedence beyond left-to-right within `+-` / `*/`
-  groups.** Sufficient for the inlines that appear in this file; extend
-  `eval_inline` if you hit something like `a + b*c` and need standard
-  precedence.
+- **`angle3d` / `vector3d` caches aren't rewritten in XML.** Same
+  rationale as conics/segments — the renderer reconstructs from points.
+  Notable side-effect: a recomputed `<expression>` like `cross = u ⊗ v`
+  flows into downstream commands within the run, but the `.ggb` you save
+  still carries the *original* `cross`/`BoadMoaddal` cache, so reopening
+  in GeoGebra briefly shows stale values until GeoGebra recomputes.
+- **No expression precedence beyond comparison → `+ -` → `* / ⊗`.**
+  Within each level, left-to-right. Sufficient for the inlines in this
+  file (no chained comparisons, no `a + b*c`-style mixed precedence at
+  the same level); extend `eval_inline` if you hit something more
+  involved.
 
 ---
 
