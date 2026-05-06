@@ -1,23 +1,24 @@
 <?xml version='1.0' encoding='utf-8'?>
 <geogebra xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" format="5.0" version="5.2.894.3" app="classic" platform="d" id="b3263146-8577-48f2-b30c-769d2686811a" xsi:noNamespaceSchemaLocation="http://www.geogebra.org/apps/xsd/ggb.xsd">
 <gui>
-	<window width="1707" height="1067" />
+	<window width="1721" height="1081" />
 	<perspectives>
 <perspective id="tmp">
 	<panes>
-		<pane location="" divider="0.06444053895723492" orientation="1" />
-		<pane location="1" divider="0.14821323960164032" orientation="1" />
+		<pane location="" divider="0.7338756536897153" orientation="1" />
+		<pane location="0" divider="0.06391632771644393" orientation="1" />
+		<pane location="0,1" divider="0.24055781522370714" orientation="1" />
 	</panes>
 	<views>
-		<view id="1" visible="true" inframe="false" stylebar="false" location="1,3" size="253" window="100,100,600,400" />
+		<view id="1" visible="true" inframe="false" stylebar="false" location="3,1,3" size="414" window="100,100,600,400" />
+		<view id="512" toolbar="0 | 1 501 5 19 , 67 | 2 15 45 18 , 7 37 | 514 3 9 , 13 44 , 47 | 16 51 | 551 550 11 , 20 22 21 23 , 55 56 57 , 12 | 69 | 510 511 , 512 513 | 533 531 , 534 532 , 522 523 , 537 536 , 535 , 538 | 521 520 | 36 , 38 49 560 | 571 30 29 570 31 33 | 17 | 540 40 41 42 , 27 28 35 , 6 , 502" visible="true" inframe="false" stylebar="true" location="3,1,1" size="729" window="100,100,600,400" />
 		<view id="4" toolbar="0 || 2020 , 2021 , 2022 || 2001 , 2003 , 2002 , 2004 , 2005 || 2040 , 2041 , 2042 , 2044 , 2043" visible="false" inframe="false" stylebar="true" location="1,1" size="300" window="100,100,600,400" />
+		<view id="2" visible="true" inframe="false" stylebar="true" location="3,3" size="110" tab="ALGEBRA" window="100,100,600,400" />
 		<view id="8" toolbar="1001 | 1002 | 1003  || 1005 | 1004 || 1006 | 1007 | 1010 || 1008 | 1009 || 6" visible="false" inframe="false" stylebar="false" location="1,3" size="300" window="100,100,600,400" />
-		<view id="512" toolbar="0 | 1 501 5 19 , 67 | 2 15 45 18 , 7 37 | 514 3 9 , 13 44 , 47 | 16 51 | 551 550 11 , 20 22 21 23 , 55 56 57 , 12 | 69 | 510 511 , 512 513 | 533 531 , 534 532 , 522 523 , 537 536 , 535 , 538 | 521 520 | 36 , 38 49 560 | 571 30 29 570 31 33 | 17 | 540 40 41 42 , 27 28 35 , 6 , 502" visible="true" inframe="false" stylebar="true" location="1,1" size="1320" window="100,100,600,400" />
-		<view id="2" visible="true" inframe="false" stylebar="true" location="3" size="110" tab="ALGEBRA" window="100,100,600,400" />
 		<view id="16" visible="false" inframe="false" stylebar="false" location="1" size="300" window="50,50,500,500" />
 		<view id="32" visible="false" inframe="false" stylebar="true" location="1" size="300" window="50,50,500,500" />
 		<view id="64" toolbar="0" visible="false" inframe="false" stylebar="false" location="1" size="480" window="50,50,500,500" />
-		<view id="4097" visible="false" inframe="false" stylebar="true" location="1" size="315" window="1203,428,700,550" />
+		<view id="4097" visible="true" inframe="false" stylebar="true" location="1" size="439" window="1203,428,700,550" />
 		<view id="70" toolbar="0 || 2020 || 2021 || 2022" visible="false" inframe="false" stylebar="true" location="1" size="900" window="50,50,500,500" />
 	</views>
 	<toolbar show="true" items="0 73 62 | 1 501 67 , 5 19 , 72 75 76 | 2 15 45 , 18 65 , 7 37 | 4 3 8 9 , 13 44 , 58 , 47 | 16 51 64 , 70 | 10 34 53 11 , 24  20 22 , 21 23 | 55 56 57 , 12 | 36 46 , 38 49  50 , 71  14  68 | 30 29 54 32 31 33 | 25 17 26 60 52 61 | 40 41 42 , 27 28 35 , 6" position="1" help="false" />
@@ -30,8 +31,8 @@
 </gui>
 <euclidianView>
 	<viewNumber viewNo="1" />
-	<size width="253" height="896" />
-	<coordSystem xZero="18.898018938524242" yZero="1070.683998961783" scale="20.925537892634633" yscale="20.925537892634782" />
+	<size width="414" height="910" />
+	<coordSystem xZero="18.898018938524245" yZero="1070.683998961783" scale="20.925537892634637" yscale="20.925537892634782" />
 	<evSettings axes="false" grid="false" gridIsBold="false" pointCapturing="3" rightAngleStyle="1" checkboxSize="26" gridType="3" />
 	<bgColor r="255" g="255" b="255" />
 	<axesColor r="37" g="37" b="37" />
@@ -56,7 +57,7 @@
 <tableview min="0.0" max="0.0" step="0.0" />
 <scripting blocked="false" disabled="false" />
 <euclidianView3D>
-	<coordSystem xZero="0.0" yZero="0.0" zZero="-1.5" scale="77.11739402914476" xAngle="14.0" zAngle="-120.0" />
+	<coordSystem xZero="-0.7085897731057069" yZero="-0.8324866061641537" zZero="-1.7075222940900119" scale="50.07031826908713" xAngle="13.0" zAngle="-115.0" />
 	<evSettings axes="true" grid="false" gridIsBold="false" pointCapturing="3" rightAngleStyle="1" gridType="3" />
 	<axis id="0" show="true" label="x" unitLabel="" tickStyle="1" showNumbers="true" />
 	<axis id="1" show="true" label="y" unitLabel="" tickStyle="1" showNumbers="true" />
@@ -318,7 +319,7 @@
 	<fading val="0.1" />
 	<lineStyle thickness="0" type="0" typeHidden="1" />
 	<eqnStyle style="user" />
-	<coords x="4.915846078540894" y="-0.0" z="-2.1375727278942196" w="-0.0" />
+	<coords x="4.915920124145407" y="-0.3711707101586445" z="2.1049279018259854" w="-0.0" />
 </element>
 <command name="IntersectPath">
 	<input a0="plane_mentaghe" a1="a" />
@@ -332,7 +333,7 @@
 	<lineStyle thickness="6" type="0" typeHidden="0" />
 	<eqnStyle style="parametric" />
 	<eigenvectors x0="1.0" y0="0.0" z0="1.0" x1="-0.0" y1="1.0" z1="1.0" />
-	<matrix A0="1.0" A1="1.0000000000000002" A2="-28.734759834943024" A3="0.0" A4="0.0" A5="0.0" />
+	<matrix A0="1.0000000000000004" A1="1.0000000000000004" A2="-28.734759834943024" A3="0.0" A4="0.0" A5="0.0" />
 </element>
 <command name="Intersect">
 	<input a0="C_ofogh" a1="C_Mentaghe" a2="1" />
@@ -503,7 +504,7 @@
 	<lineStyle thickness="3" type="0" typeHidden="0" />
 	<eqnStyle style="parametric" />
 	<eigenvectors x0="1.0" y0="0.0" z0="1.0" x1="-0.0" y1="1.0" z1="1.0" />
-	<matrix A0="1.0" A1="1.0" A2="-28.734759834942984" A3="0.0" A4="-0.0" A5="-0.0" />
+	<matrix A0="1.0" A1="1.0" A2="-28.571876547831575" A3="0.0" A4="-0.0" A5="-0.0" />
 </element>
 <command name="Mirror">
 	<input a0="NpM" a1="A" />
@@ -530,7 +531,7 @@
 	<lineStyle thickness="5" type="0" typeHidden="1" />
 	<eqnStyle style="parametric" />
 	<eigenvectors x0="1.0" y0="0.0" z0="1.0" x1="-0.0" y1="1.0" z1="1.0" />
-	<matrix A0="1.0" A1="1.0" A2="-3.552713678800501E-15" A3="0.0" A4="-3.790432682092047" A5="-3.790432682092046" />
+	<matrix A0="1.0" A1="1.0" A2="-3.552713678800501E-15" A3="0.0" A4="-3.790432682092045" A5="-3.7904326820920464" />
 </element>
 <command name="Plane">
 	<input a0="c" />
@@ -544,7 +545,7 @@
 	<fading val="0.1" />
 	<lineStyle thickness="0" type="0" typeHidden="1" />
 	<eqnStyle style="user" />
-	<coords x="-22.916837297368136" y="0.0" z="-52.70260201710515" w="1.4210854715202004E-14" />
+	<coords x="-22.915011589997935" y="-9.151780251984135" z="51.90272491051957" w="-2.8421709430404007E-14" />
 </element>
 <command name="OrthogonalLine">
 	<input a0="A" a1="plane_ghotbMentaghe" />
@@ -611,7 +612,7 @@
 	<lineStyle thickness="2" type="0" typeHidden="0" />
 	<eqnStyle style="parametric" />
 	<eigenvectors x0="1.0" y0="0.0" z0="1.0" x1="-0.0" y1="1.0" z1="1.0" />
-	<matrix A0="1.0" A1="1.0" A2="1.5653275522870363E-29" A3="0.0" A4="-5.360481306276801" A5="3.9564220607602475E-15" />
+	<matrix A0="1.0" A1="1.0" A2="2.2012418704036472E-30" A3="0.0" A4="-5.360481306276799" A5="1.4836582727850936E-15" />
 </element>
 <command name="Rotate">
 	<input a0="MozeGhamar" a1="90°" a2="Line_mentaghe" />
@@ -677,7 +678,7 @@
 	<lineStyle thickness="1" type="0" typeHidden="0" />
 	<eqnStyle style="parametric" />
 	<eigenvectors x0="1.0" y0="0.0" z0="1.0" x1="-0.0" y1="1.0" z1="1.0" />
-	<matrix A0="1.0" A1="1.0" A2="-28.42079811257733" A3="0.0" A4="-0.0" A5="-0.0" />
+	<matrix A0="1.0" A1="1.0" A2="-28.420798112577312" A3="0.0" A4="-0.0" A5="-0.0" />
 </element>
 <command name="Mirror">
 	<input a0="C_Arzghamrmanfi6" a1="A" />
@@ -692,7 +693,7 @@
 	<lineStyle thickness="1" type="0" typeHidden="0" />
 	<eqnStyle style="parametric" />
 	<eigenvectors x0="1.0" y0="0.0" z0="1.0" x1="-0.0" y1="1.0" z1="1.0" />
-	<matrix A0="1.0" A1="1.0" A2="-28.42079811257733" A3="0.0" A4="-0.0" A5="-0.0" />
+	<matrix A0="1.0" A1="1.0" A2="-28.420798112577312" A3="0.0" A4="-0.0" A5="-0.0" />
 </element>
 <command name="CircleArc">
 	<input a0="A" a1="Ghamar" a2="MozeGhamar" />
@@ -709,7 +710,7 @@
 	<outlyingIntersections val="false" />
 	<keepTypeOnTransform val="true" />
 	<eigenvectors x0="1.0" y0="0.0" z0="1.0" x1="-0.0" y1="1.0" z1="1.0" />
-	<matrix A0="1.0" A1="1.0" A2="-28.734759834942984" A3="0.0" A4="-0.0" A5="-0.0" />
+	<matrix A0="1.0" A1="1.0" A2="-28.734759834942995" A3="0.0" A4="-0.0" A5="-0.0" />
 </element>
 <command name="Circle">
 	<input a0="Line_moaddel" a1="Ghamar" />
@@ -723,7 +724,7 @@
 	<lineStyle thickness="2" type="0" typeHidden="0" />
 	<eqnStyle style="parametric" />
 	<eigenvectors x0="1.0" y0="0.0" z0="1.0" x1="-0.0" y1="1.0" z1="1.0" />
-	<matrix A0="1.0" A1="1.0" A2="-27.537727384071164" A3="0.0" A4="-0.0" A5="-0.0" />
+	<matrix A0="1.0" A1="1.0" A2="-28.42375851488355" A3="0.0" A4="-0.0" A5="-0.0" />
 </element>
 <command name="Plane">
 	<input a0="C_ofogh" />
@@ -784,7 +785,7 @@
 	<lineStyle thickness="3" type="0" typeHidden="0" />
 	<eqnStyle style="parametric" />
 	<eigenvectors x0="1.0" y0="0.0" z0="1.0" x1="-0.0" y1="1.0" z1="1.0" />
-	<matrix A0="1.0" A1="1.0" A2="-7.105427357601002E-15" A3="0.0" A4="-4.159303286503661" A5="-3.3815611787786524" />
+	<matrix A0="1.0" A1="1.0" A2="5.329070518200751E-15" A3="0.0" A4="-3.5878512952533" A5="-3.9827230531499733" />
 </element>
 <command name="Intersect">
 	<input a0="C_ofogh" a1="C_yomiGhamar" a2="1" />
@@ -810,7 +811,7 @@
 	<lineStyle thickness="5" type="0" typeHidden="0" />
 	<eqnStyle style="parametric" />
 	<eigenvectors x0="1.0" y0="0.0" z0="1.0" x1="-0.0" y1="1.0" z1="1.0" />
-	<matrix A0="1.0" A1="1.0" A2="2.782243964332845E-18" A3="0.0" A4="-5.360481305460353" A5="-1.668005984501508E-9" />
+	<matrix A0="1.0" A1="1.0" A2="2.6955152939850586E-18" A3="0.0" A4="-5.360481305460353" A5="-1.6418024527893296E-9" />
 </element>
 <command name="Intersect">
 	<input a0="C_Moaddel" a1="C_MaylGhamr" a2="1" />
@@ -861,7 +862,7 @@
 	<labelMode val="0" />
 	<lineStyle thickness="5" type="0" typeHidden="1" />
 	<startPoint exp="A" />
-	<coords x="2.2722076849191118E-5" y="-5.199987560575024" z="1.301879105098375" w="0.0" />
+	<coords x="2.9315481971177717E-5" y="-5.09053281293967" z="1.6796533911697877" w="0.0" />
 </element>
 <command name="Vector">
 	<input a0="A" a1="F" />
@@ -874,7 +875,7 @@
 	<labelMode val="0" />
 	<lineStyle thickness="5" type="0" typeHidden="1" />
 	<startPoint exp="A" />
-	<coords x="-3.5112512994806694E-11" y="-5.360481306276424" z="-2.0117988013268473E-6" w="0.0" />
+	<coords x="-8.9089419570915E-12" y="-5.360481306276777" z="-5.104447744486151E-7" w="0.0" />
 </element>
 <expression label="cross" exp="u ⊗ v" type="vector" />
 <element type="vector3d" label="cross">
@@ -883,7 +884,7 @@
 	<layer val="8" />
 	<labelMode val="0" />
 	<lineStyle thickness="5" type="0" typeHidden="1" />
-	<coords x="6.97870906724046" y="-2.6574799227748442E-20" z="-1.2180145077449608E-4" w="0.0" />
+	<coords x="9.003753202825916" y="1.2666710424078279E-20" z="-1.571451384422534E-4" w="0.0" />
 </element>
 <command name="Vector">
 	<input a0="(0, 0, 1)" />
@@ -903,7 +904,7 @@
 </command>
 <element type="angle3d" label="BoadMoaddal">
 	<angleStyle val="1" />
-	<value val="0.2453196826443149" />
+	<value val="0.31870825015289544" />
 	<lineStyle thickness="5" type="0" typeHidden="2" opacity="178" />
 	<arcSize val="30" />
 	<show object="true" label="true" ev="4" />
@@ -925,12 +926,12 @@
 	<output a0="θ_signed" />
 </command>
 <element type="numeric" label="θ_signed">
-	<value val="14.055782447008" />
+	<value val="18.9956874459802" />
 	<objColor r="0" g="100" b="0" alpha="0.10000000149011612" />
 </element>
 <expression label="aaa" exp="BoadMoaddal / °" />
 <element type="numeric" label="aaa">
-	<value val="14.055782447008" />
+	<value val="18.9956874459802" />
 	<objColor r="0" g="0" b="0" alpha="0.10000000149011612" />
 </element>
 <command name="Rotate">
@@ -944,7 +945,7 @@
 	<layer val="8" />
 	<labelMode val="3" />
 	<pointSize val="5" />
-	<coords x="2.27221109104278e-05" y="-5.19998707197696" z="1.30188105666348" w="1.0" />
+	<coords x="3.0452862730752e-05" y="-5.06856599321057" z="1.74482050838616" w="1.0" />
 </element>
 <command name="Circle">
 	<input a0="MagharebGhamr" a1="Ghamar" a2="Mirror[Ghamar, A]" />
@@ -959,7 +960,7 @@
 	<lineStyle thickness="4" type="0" typeHidden="0" />
 	<eqnStyle style="parametric" />
 	<eigenvectors x0="1.0" y0="0.0" z0="1.0" x1="-0.0" y1="1.0" z1="1.0" />
-	<matrix A0="1.0" A1="1.0" A2="3.552713678800501E-15" A3="0.0" A4="-0.549946718387574" A5="-5.332196399409697" />
+	<matrix A0="1.0" A1="1.0" A2="0.0" A3="0.0" A4="-0.27921649770790463" A5="-5.353204459232875" />
 </element>
 <command name="Mirror">
 	<input a0="Shams" a1="A" />
@@ -988,7 +989,7 @@
 	<labelMode val="3" />
 	<caption val="قمرمعدل" />
 	<pointSize val="5" />
-	<coords x="0.562965996241996" y="-5.1712334310657" z="1.29467135731301" w="1.0" />
+	<coords x="-2.13718259967834" y="-4.64830527786827" z="1.60014637277879" w="1.0" />
 </element>
 <command name="Mirror">
 	<input a0="GhamarMoaddal" a1="A" />
@@ -1003,7 +1004,7 @@
 	<labelMode val="3" />
 	<caption val="ن قمر معدل" />
 	<pointSize val="5" />
-	<coords x="-0.562965996241996" y="5.1712334310657" z="-1.29467135731301" w="1.0" />
+	<coords x="2.13718259967834" y="4.64830527786827" z="-1.60014637277879" w="1.0" />
 </element>
 <command name="CircumcircleArc">
 	<input a0="GhamarMoaddal" a1="Shams" a2="Hamal" />
@@ -1019,7 +1020,7 @@
 	<outlyingIntersections val="false" />
 	<keepTypeOnTransform val="true" />
 	<eigenvectors x0="1.0" y0="0.0" z0="1.0" x1="-0.0" y1="1.0" z1="1.0" />
-	<matrix A0="1.0" A1="1.0" A2="-7.105427357601002E-15" A3="0.0" A4="-2.06302795095052" A5="-4.947592900445622" />
+	<matrix A0="1.0" A1="1.0" A2="2.6645352591003757E-15" A3="0.0" A4="-4.633451209876705" A5="-2.695531435660711" />
 </element>
 <command name="Rotate">
 	<input a0="C_ofogh" a1="-9°" a2="Line_moaddel" />
@@ -1062,7 +1063,7 @@
 	<lineStyle thickness="2" type="0" typeHidden="0" />
 	<eqnStyle style="parametric" />
 	<eigenvectors x0="1.0" y0="0.0" z0="1.0" x1="-0.0" y1="1.0" z1="1.0" />
-	<matrix A0="1.0" A1="1.0" A2="-1.7763568394002505E-15" A3="0.0" A4="-3.7904326820920455" A5="-3.790432682092049" />
+	<matrix A0="1.0" A1="1.0" A2="-3.552713678800501E-15" A3="0.0" A4="-3.790432682092046" A5="-3.790432682092048" />
 </element>
 <command name="Line">
 	<input a0="N" a1="S" />
@@ -1318,7 +1319,7 @@
 	<output a0="eee" />
 </command>
 <element type="numeric" label="eee">
-	<value val="0.515194901078892" />
+	<value val="0.495692964492928" />
 	<objColor r="0" g="0" b="0" alpha="0.10000000149011612" />
 </element>
 <command name="Circle">
@@ -1334,7 +1335,7 @@
 	<lineStyle thickness="3" type="0" typeHidden="0" />
 	<eqnStyle style="parametric" />
 	<eigenvectors x0="1.0" y0="0.0" z0="1.0" x1="-0.0" y1="1.0" z1="1.0" />
-	<matrix A0="1.0" A1="1.0" A2="0.0" A3="0.0" A4="-2.9390764864374455" A5="-4.482921953571528" />
+	<matrix A0="1.0" A1="1.0" A2="5.329070518200751E-15" A3="0.0" A4="-4.47315249593291" A5="-2.953923929804591" />
 </element>
 <command name="Circle">
 	<input a0="Ghamar" a1="Zenith" a2="Nadir" />
@@ -1349,7 +1350,7 @@
 	<lineStyle thickness="2" type="0" typeHidden="0" />
 	<eqnStyle style="parametric" />
 	<eigenvectors x0="1.0" y0="0.0" z0="1.0" x1="-0.0" y1="1.0" z1="1.0" />
-	<matrix A0="1.0" A1="1.0" A2="3.552713678800501E-15" A3="0.0" A4="-3.309310283404572" A5="-4.2170161587425525" />
+	<matrix A0="1.0" A1="1.0" A2="-3.552713678800501E-15" A3="0.0" A4="-3.144822267995032" A5="-4.341065852721612" />
 </element>
 <command name="Circle">
 	<input a0="NpM" a1="NPM'" a2="J" />
@@ -1364,7 +1365,7 @@
 	<lineStyle thickness="2" type="0" typeHidden="0" />
 	<eqnStyle style="parametric" />
 	<eigenvectors x0="1.0" y0="0.0" z0="1.0" x1="-0.0" y1="1.0" z1="1.0" />
-	<matrix A0="1.0" A1="1.0" A2="0.0" A3="0.0" A4="-5.3604813062767995" A5="0.0" />
+	<matrix A0="1.0" A1="1.0" A2="0.0" A3="0.0" A4="-5.360481306276799" A5="0.0" />
 </element>
 <element type="boolean" label="w">
 	<value val="true" />
@@ -1569,7 +1570,7 @@
 </command>
 <element type="angle3d" label="α">
 	<angleStyle val="1" />
-	<value val="0.2453196826443149" />
+	<value val="0.31870825015289544" />
 	<lineStyle thickness="5" type="0" typeHidden="2" opacity="178" />
 	<arcSize val="30" />
 	<show object="false" label="true" ev="4" />
@@ -1589,7 +1590,7 @@
 	<fading val="0.1" />
 	<lineStyle thickness="0" type="0" typeHidden="1" />
 	<eqnStyle style="user" />
-	<coords x="1582.5799653217966" y="7.275083313551534E-14" z="-0.027621231073785883" w="-1731.4845693719592" />
+	<coords x="1633.4997488143952" y="-5.1741597117960225E-14" z="-0.02850994895018934" w="910.9618472427034" />
 </element>
 <command name="Intersect">
 	<input a0="Line_moaddel" a1="p_1" />
@@ -1655,7 +1656,7 @@
 </command>
 <element type="angle3d" label="β">
 	<angleStyle val="1" />
-	<value val="0.24531566847458852" />
+	<value val="0.318709980580095" />
 	<lineStyle thickness="5" type="0" typeHidden="2" opacity="178" />
 	<arcSize val="30" />
 	<show object="true" label="true" ev="4" />

@@ -546,7 +546,23 @@ def cmd_Sequence(*args):
 
 
 def cmd_If(*args):
-    return None  # not on Arz's chain
+    """If[cond, then] or If[cond, then, else].
+
+    `cond` may be a Python bool (from a comparison) or a Number (treated as
+    truthy when nonzero). Anything else falls back to None (preserve cache).
+    """
+    if not args:
+        return None
+    cond = args[0]
+    if isinstance(cond, bool):
+        c = cond
+    elif isinstance(cond, Number):
+        c = (cond.v != 0.0)
+    else:
+        return None
+    if c:
+        return args[1] if len(args) > 1 else None
+    return args[2] if len(args) > 2 else None
 
 
 CMD = {
@@ -610,7 +626,7 @@ def _solve3(M):
 # Identifiers may contain letters, digits, underscores, single quotes,
 # and braces (e.g. W'_{1}).
 
-ID_RE = re.compile(r"^[A-Za-z][A-Za-z0-9_'{}]*$")
+ID_RE = re.compile(r"^[^\W\d][\w'{}]*$")  # unicode letters allowed (e.g. θ_signed, α, β)
 
 
 def _split_top(s, seps):
@@ -627,8 +643,11 @@ def _split_top(s, seps):
         elif ch in ")]":
             depth -= 1; buf.append(ch)
         elif depth == 0 and ch in seps:
-            # Reject leading '-' (unary)
-            if ch == '-' and (not buf or buf[-1].strip() == ''):
+            # Reject leading '-' (unary): only when nothing non-whitespace
+            # has been emitted into the current buf yet. The previous check
+            # only inspected buf[-1], which mis-fired on `360 - X` (the
+            # trailing space made it look like a unary minus).
+            if ch == '-' and "".join(buf).strip() == '':
                 buf.append(ch)
             else:
                 out.append("".join(buf)); out.append(ch); buf = []
@@ -692,6 +711,21 @@ def eval_inline(expr, scene):
 
     # Function call: Name[args]   (also tolerate Name(args) just in case)
     m = re.match(r"^([A-Za-z][A-Za-z0-9_]*)\[(.*)\]$", expr)
+    if m:
+        # Make sure the closing `]` matches the opening one — otherwise
+        # `Distance[X] ≥ Distance[Y]` would mis-parse as one Distance call
+        # because `(.*)` is greedy.
+        depth = 0
+        ok = False
+        for i, ch in enumerate(expr):
+            if ch == '[': depth += 1
+            elif ch == ']':
+                depth -= 1
+                if depth == 0:
+                    ok = (i == len(expr) - 1)
+                    break
+        if not ok:
+            m = None
     if not m:
         m = re.match(r"^([A-Za-z][A-Za-z0-9_]*)\((.*)\)$", expr)
         if m:
@@ -715,13 +749,11 @@ def eval_inline(expr, scene):
             return CMD[fname](*args)
         raise ValueError(f"unknown function {fname}")
 
-    # Number with degree sign
-    if expr.endswith('°'):
-        body = expr[:-1].strip()
-        v = eval_inline(body, scene)
-        if isinstance(v, Number): return Number(math.radians(v.v))
-        if isinstance(v, (int, float)): return Number(math.radians(float(v)))
-        raise ValueError(f"can't apply ° to {v!r}")
+    # Bare degree symbol — value of one degree in radians (π/180).
+    # Lets `BoadMoaddal / °` evaluate as radians → degrees (BoadMoaddal_rad
+    # divided by π/180 yields the value in degrees).
+    if expr == '°':
+        return Number(math.pi / 180.0)
 
     # Plain number
     try:
@@ -737,7 +769,16 @@ def eval_inline(expr, scene):
         if isinstance(v, Vector3D): return Vector3D(-v.x, -v.y, -v.z)
         raise ValueError(f"can't negate {type(v).__name__}")
 
-    # Binary +, -, *, / (left-to-right, no precedence beyond what splitting gives)
+    # Comparison operators (lowest precedence, single comparison only).
+    # Returns a Python bool — fed to cmd_If for branch selection.
+    parts = _split_top(expr, "<>≤≥≠")
+    if len(parts) >= 3:
+        a = eval_inline(parts[0], scene)
+        op = parts[1]
+        b = eval_inline(parts[2], scene)
+        return _apply_cmp(op, a, b)
+
+    # Binary +, -, *, /, ⊗ (left-to-right, no precedence beyond what splitting gives)
     # We handle only the cases this construction needs: numeric * point, etc.
     parts = _split_top(expr, "+-")
     if len(parts) > 1:
@@ -748,7 +789,7 @@ def eval_inline(expr, scene):
             op = parts[i]; rhs = eval_inline(parts[i+1], scene); i += 2
             acc = _apply_op(op, acc, rhs)
         return acc
-    parts = _split_top(expr, "*/")
+    parts = _split_top(expr, "*/⊗")
     if len(parts) > 1:
         acc = eval_inline(parts[0], scene)
         i = 1
@@ -757,7 +798,32 @@ def eval_inline(expr, scene):
             acc = _apply_op(op, acc, rhs)
         return acc
 
+    # Number with trailing degree sign (e.g. `23.5°` -> radians). Must come
+    # AFTER the operator splits so `BoadMoaddal / °` isn't swallowed here.
+    if expr.endswith('°'):
+        body = expr[:-1].strip()
+        v = eval_inline(body, scene)
+        if isinstance(v, Number): return Number(math.radians(v.v))
+        if isinstance(v, (int, float)): return Number(math.radians(float(v)))
+        raise ValueError(f"can't apply ° to {v!r}")
+
     raise ValueError(f"can't evaluate inline expression: {expr!r}")
+
+
+def _apply_cmp(op, a, b):
+    """Evaluate a single comparison (<, >, ≤, ≥, ≠, =) on Numbers."""
+    def _num(x):
+        if isinstance(x, Number): return x.v
+        if isinstance(x, (int, float)): return float(x)
+        raise TypeError(f"comparison needs Number, got {type(x).__name__}")
+    av, bv = _num(a), _num(b)
+    if op == '<':  return av <  bv
+    if op == '>':  return av >  bv
+    if op == '≤':  return av <= bv
+    if op == '≥':  return av >= bv
+    if op == '=':  return av == bv
+    if op == '≠':  return av != bv
+    raise ValueError(f"unknown comparison op: {op!r}")
 
 
 def _apply_op(op, a, b):
@@ -786,6 +852,14 @@ def _apply_op(op, a, b):
         return Point3D(*add(x, y))
     if kind == "pp" and op == "-":
         return Point3D(*sub(x, y))
+    # Vector⊗Vector → cross product (vector). The "pp" kind covers
+    # Vector3D ⊗ Vector3D in this construction (e.g. cross = u ⊗ v).
+    if kind == "pp" and op == "⊗":
+        return Vector3D(*crs(x, y))
+    # Vector*Vector → dot product (scalar). GGB uses `*` between two
+    # vectors to mean dot — e.g. `(cross * n) < 0` in If conditions.
+    if kind == "pp" and op == "*" and isinstance(a, (Vector3D,)) and isinstance(b, (Vector3D,)):
+        return Number(dot(x, y))
     raise TypeError(f"can't apply {op} to {type(a).__name__}, {type(b).__name__}")
 
 
@@ -862,8 +936,23 @@ def evaluate_construction(root, slider_overrides):
         else:
             scene[lbl] = Number(val)
 
-    # Walk in document order; commands recompute outputs.
+    # Walk in document order; commands recompute outputs. <expression>
+    # nodes are also handled so dependent vars (e.g. cross = u ⊗ v) follow
+    # the swept slider — without this, anything that consumes `cross`
+    # (like sign_{1} via the If condition) would use a stale cache.
     for node in con:
+        if node.tag == "expression":
+            lbl = node.get("label")
+            exp = node.get("exp")
+            if not lbl or not exp:
+                continue
+            try:
+                result = eval_inline(exp, scene)
+            except Exception:
+                continue
+            if result is not None:
+                scene[lbl] = result
+            continue
         if node.tag != "command":
             continue
         name = node.get("name")

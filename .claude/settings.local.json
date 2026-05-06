@@ -14,7 +14,8 @@
       "Bash(where magick *)",
       "Bash(python -c \"import pdf2image; print\\('pdf2image ok'\\)\")",
       "Bash(python -c \"import PIL; print\\('Pillow ok'\\)\")",
-      "Bash(pdftoppm --help)"
+      "Bash(pdftoppm --help)",
+      "Bash(cp /tmp/ggb.xml /c/Users/aminv/AppData/Local/Temp/ggb.xml)"
     ],
     "additionalDirectories": [
       "c:\\c\\Users\\aminv\\Documents\\geogebra_01\\Ali_example_01"
