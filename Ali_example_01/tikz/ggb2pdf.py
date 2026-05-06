@@ -200,6 +200,58 @@ def extract_sphere_radius(pts):
     return 5.0
 
 
+def extract_quadric_spheres(root):
+    """List origin-centered sphere quadrics with their alpha + rgb.
+
+    GGB stores a sphere as a 4x4 quadric matrix; for a sphere centered at
+    the origin only A0=A1=A2=1 and A3=-r^2 are non-zero (off-diagonal
+    entries A4..A9 encode shear / center-offset and must be 0).
+    """
+    out = []
+    for el in root.iter("element"):
+        if el.get("type") != "quadric":
+            continue
+        m = el.find("matrix")
+        col = el.find("objColor")
+        if m is None or col is None:
+            continue
+        try:
+            A0 = float(m.get("A0", "0")); A1 = float(m.get("A1", "0"))
+            A2 = float(m.get("A2", "0")); A3 = float(m.get("A3", "0"))
+            off = sum(abs(float(m.get(f"A{i}", "0"))) for i in range(4, 10))
+        except (TypeError, ValueError):
+            continue
+        if (abs(A0 - 1) > 1e-6 or abs(A1 - 1) > 1e-6 or abs(A2 - 1) > 1e-6
+                or off > 1e-6 or A3 >= 0):
+            continue
+        try:
+            out.append({
+                "label":  el.get("label"),
+                "radius": math.sqrt(-A3),
+                "alpha":  float(col.get("alpha", "1")),
+                "rgb":    (int(col.get("r", "0")),
+                           int(col.get("g", "0")),
+                           int(col.get("b", "0"))),
+            })
+        except (TypeError, ValueError):
+            continue
+    return out
+
+
+def find_sphere_style_by_radius(spheres, R, tol_rel=1e-3,
+                                default_alpha=0.55,
+                                default_rgb=(255, 255, 255)):
+    """Pick the quadric whose radius matches R (within tol_rel * R).
+    Returns (alpha, rgb) or the supplied defaults if no match.
+    """
+    if not spheres:
+        return (default_alpha, default_rgb)
+    best = min(spheres, key=lambda s: abs(s["radius"] - R))
+    if abs(best["radius"] - R) > tol_rel * max(R, 1.0):
+        return (default_alpha, default_rgb)
+    return (best["alpha"], best["rgb"])
+
+
 # ---------------------------------------------------------------------------
 # Camera / visibility math
 # ---------------------------------------------------------------------------
@@ -615,19 +667,24 @@ def build_scene(ggb_path, theta_deg, phi_deg, show_axes_override=None):
     out.append("")
 
     # ------- Sphere ball shading (back layer, in screen coords) -------
-    # Two-pass shading for a stronger 3-D feel:
-    #   1. A soft elliptical drop shadow below the sphere (gives it weight,
-    #      stops it looking like a flat disc).
-    #   2. `\shadedraw` with `ball color=white` for a bright highlight and
-    #      a darkened rim — the radial gradient that gives the "ball" look
-    #      (technique from latex.org/forum/viewtopic.php?t=25316).
-    # Opacity is kept moderate (0.55) so back-side arcs (drawn afterwards
-    # on the same `back` layer) remain legible.
+    # Look up the main sphere's GGB style by matching its radius. The
+    # quadric's <objColor alpha=...> drives the rendered opacity, and
+    # <objColor r g b> drives the ball-color highlight tint, so editing
+    # these in GeoGebra propagates here. Falls back to white / 0.55 if
+    # no matching quadric is found.
+    main_alpha, main_rgb = find_sphere_style_by_radius(
+        extract_quadric_spheres(root), R)
+    # GGB caps the apparent fill at ~85% even at alpha=1.0 (matches the
+    # cap used for inner spheres and conics); mirror it so a fully-opaque
+    # sphere still lets back-side arcs glimmer through.
+    main_alpha = min(0.85, main_alpha)
+    main_color = rgb_color(main_rgb)
+    out.append(r"% sphere alpha = " + f"{main_alpha:.3f} (from .ggb quadric)")
     out.append(r"\begin{pgfonlayer}{back}")
     out.append(r"\begin{scope}[tdplot_screen_coords]")
     out.append(rf"\shade[inner color=black,outer color=black!0,opacity=0.22] "
                rf"(0,{fmt(-R*0.06)}) ellipse ({fmt(R*1.05)} and {fmt(R*0.18)});")
-    out.append(rf"\shadedraw[ball color=white,opacity=0.55,"
+    out.append(rf"\shadedraw[ball color={main_color},opacity={main_alpha:.3f},"
                rf"draw=gray!45,line width=0.25pt] (0,0) circle ({fmt(R)});")
     out.append(r"\end{scope}")
     out.append(r"\end{pgfonlayer}")

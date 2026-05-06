@@ -15,7 +15,9 @@
       "Bash(python -c \"import pdf2image; print\\('pdf2image ok'\\)\")",
       "Bash(python -c \"import PIL; print\\('Pillow ok'\\)\")",
       "Bash(pdftoppm --help)",
-      "Bash(cp /tmp/ggb.xml /c/Users/aminv/AppData/Local/Temp/ggb.xml)"
+      "Bash(cp /tmp/ggb.xml /c/Users/aminv/AppData/Local/Temp/ggb.xml)",
+      "Bash(python)",
+      "Bash(python c:/Users/aminv/Documents/geogebra_01/Ali_example_01/tikz/ggb2pdf.py c:/Users/aminv/Documents/geogebra_01/Ali_example_01/Final_Helal_1404_BSe_BMo.ggb --tex-only)"
     ],
     "additionalDirectories": [
       "c:\\c\\Users\\aminv\\Documents\\geogebra_01\\Ali_example_01"
